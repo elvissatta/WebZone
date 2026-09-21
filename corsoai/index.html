@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Intelligenza artificiale: il corso in sintesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:inherit}
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EDF1F4; --card:#FFFFFF; --ink:#15232D; --muted:#4F626F; --line:#CBD5DC; --script:#E2E9EE; --focus:#2F6BD8;
+  --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --serif:'Literata',Georgia,'Times New Roman',serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0E1920;--card:#15262F;--ink:#E7EEF2;--muted:#9FB2BE;--line:#2B3F4B;--script:#12212A;--focus:#7FA6F5}
+}
+:root[data-theme="dark"]{--bg:#0E1920;--card:#15262F;--ink:#E7EEF2;--muted:#9FB2BE;--line:#2B3F4B;--script:#12212A;--focus:#7FA6F5}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans)}
+button,select{font-family:var(--sans)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* barra superiore */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.brand{font-weight:700;font-size:15px;white-space:nowrap}
+.strip{display:flex;gap:3px;flex:1 1 400px;min-width:260px}
+.seg{flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--muted);font:500 11.5px/1.25 var(--sans)}
+.seg i{display:block;height:8px;background:var(--c);margin-bottom:5px}
+.seg[aria-current="true"]{color:var(--ink);font-weight:700}
+.seg[aria-current="true"] i{outline:2px solid var(--ink);outline-offset:1px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn,select{font:600 13.5px var(--sans);padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:4px;cursor:pointer}
+.btn:hover{background:var(--ink);color:var(--bg)}
+select{max-width:210px;font-weight:500}
+.count{font-size:13px;color:var(--muted);min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* struttura slide */
+.wrap{max-width:1300px;margin:0 auto;padding:22px 20px 70px}
+.slide{display:none}
+.slide.on{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-top:8px solid var(--sc);border-radius:6px;padding:28px 32px 16px;min-height:460px;display:flex;flex-direction:column;font-size:17px}
+.card h2{font-size:clamp(25px,3vw,34px);line-height:1.15;letter-spacing:-.012em;font-weight:700;margin:0 0 18px}
+.card .body{flex:1}
+.card footer{display:flex;justify-content:space-between;gap:12px;margin-top:22px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.lead{font-size:1.22em;line-height:1.35;font-weight:550;margin:0 0 16px}
+.small{font-size:.88em;color:var(--muted)}
+.body p{margin:0 0 .8em;line-height:1.5}
+
+/* liste e blocchi */
+ul.k{list-style:none;padding:0;margin:0 0 6px}
+ul.k li{position:relative;padding-left:22px;margin:.55em 0;line-height:1.42}
+ul.k li::before{content:"";position:absolute;left:1px;top:.52em;width:9px;height:9px;background:var(--sc);border-radius:1px}
+.cols2,.cols3,.cols4{display:grid;gap:12px;margin:12px 0}
+.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.box{border:1px solid var(--line);border-left:5px solid var(--sc);border-radius:4px;padding:11px 14px 12px}
+.box h4{margin:0 0 5px;font-size:1em;font-weight:700;line-height:1.25}
+.box p{margin:0;font-size:.88em;line-height:1.42;color:var(--muted)}
+.box p+p{margin-top:.5em}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--script);color:var(--ink);margin-left:6px;vertical-align:1px}
+.tw{overflow-x:auto;margin:6px 0}
+table.t{width:100%;border-collapse:collapse;font-size:.86em;line-height:1.35}
+table.t th{text-align:left;font-weight:700;border-bottom:2px solid var(--ink);padding:6px 10px 6px 0;white-space:nowrap}
+table.t td{border-bottom:1px solid var(--line);padding:8px 10px 8px 0;vertical-align:top}
+table.t td:first-child{font-weight:600}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0 16px}
+.flow .n{border:1.5px solid var(--ink);background:var(--card);border-radius:4px;padding:7px 11px;font-size:.86em;line-height:1.3;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.flow .n small{display:block;color:var(--muted);font-size:.84em}
+.flow .a{color:var(--muted);align-self:center;font-size:1.05em}
+.tl .r{display:grid;grid-template-columns:86px 1fr;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.92em;line-height:1.38}
+.tl .y{font-weight:700;font-variant-numeric:tabular-nums}
+.eq{font-family:var(--serif);font-size:1.05em;background:var(--script);padding:9px 14px;border-radius:4px;margin:10px 0;overflow-x:auto;white-space:nowrap}
+.bar{display:flex;height:34px;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;font-size:.8em;margin:12px 0}
+.bar span{display:flex;align-items:center;padding:0 10px;white-space:nowrap}
+.bar .l{background:var(--sc);color:#15232D;font-weight:600}
+.bar .u{flex:1;background:repeating-linear-gradient(135deg,var(--card) 0 6px,var(--script) 6px 12px);color:var(--ink)}
+.scale{margin:14px 0}
+.scale .g{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--sc),var(--ink))}
+.scale .m{display:flex;justify-content:space-between;font-size:.8em;margin-top:6px;gap:8px}
+.scale .m span{flex:1}.scale .m span:nth-child(2){text-align:center}.scale .m span:last-child{text-align:right}
+.bigstrip{display:flex;gap:4px;margin:26px 0 16px}
+.bigstrip span{flex:1;border-top:38px solid var(--c);padding:9px 6px 0 0;font-size:13px;line-height:1.25;font-weight:600}
+.hero h2{font-size:clamp(38px,6vw,68px);line-height:1.02;margin-bottom:18px}
+.hero .lead{font-size:1.4em;max-width:26ch}
+.mp{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}
+.g4,.g2{display:grid;gap:2px}.g4{grid-template-columns:repeat(4,32px)}.g2{grid-template-columns:repeat(2,32px)}
+.g4 span,.g2 span{display:grid;place-items:center;height:32px;font-size:14px;border:1px solid var(--line);background:var(--card)}
+.g4 .ta{background:color-mix(in srgb,var(--sc) 30%,var(--card))}
+.g4 .mx{font-weight:700;outline:2px solid var(--ink);outline-offset:-2px}
+.mp .a{font-size:.8em;color:var(--muted)}
+dl.gl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px;margin:0;font-size:.82em;line-height:1.35}
+dl.gl div{padding:5px 0;border-bottom:1px solid var(--line)}
+dl.gl dt{font-weight:700;display:inline}dl.gl dd{display:inline;margin:0}
+dl.gl dt::after{content:": "}
+
+/* diagrammi */
+svg.dg{width:100%;height:auto;max-height:290px;display:block;margin:6px 0 10px}
+.dg text{font:12px var(--sans);fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:11px}
+.dg .ax{stroke:var(--muted);stroke-width:1.5}
+.dg .fit{stroke:var(--sc);stroke-width:3.5}
+.dg .res{stroke:var(--ink);stroke-dasharray:3 3;stroke-width:1.5}
+.dg .pt circle{fill:var(--ink)}
+.dg .ed line{stroke:var(--muted);stroke-width:.8;opacity:.5}
+.dg .io{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.dg .hid{fill:var(--sc);stroke:var(--ink);stroke-width:1.2}
+.dg .bx{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.dg .bs{fill:color-mix(in srgb,var(--sc) 38%,var(--card));stroke:var(--ink);stroke-width:1.5}
+.dg .ln{stroke:var(--ink);stroke-width:1.6;fill:none}
+.dg .ld{stroke:var(--muted);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+.dg .ah{fill:var(--ink)}
+
+/* copione */
+.script{background:var(--script);border-radius:6px;padding:22px 26px 10px;font-family:var(--serif);font-size:17px;line-height:1.65}
+.script section{margin-bottom:20px}
+.script h3{font:700 13.5px/1.3 var(--sans);margin:0 0 7px}
+.script p{margin:0 0 .8em}
+.script .prec,.script .lab{background:var(--card);border-left:5px solid var(--sc);padding:12px 16px 4px;border-radius:0 4px 4px 0}
+.script .lab{border-left-style:dashed}
+
+body.solo .slide.on{grid-template-columns:minmax(0,1fr)}
+body.solo .script{display:none}
+body.solo .card{max-width:1120px;margin:0 auto;width:100%;font-size:21px;min-height:520px}
+body.solo .cols3,body.solo .cols4{gap:14px}
+
+@media (max-width:1000px){.slide.on{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:720px){
+  .cols2,.cols3,.cols4,dl.gl{grid-template-columns:minmax(0,1fr)}
+  .card{padding:20px 18px 12px;min-height:0}
+  .seg span{display:none}
+  .wrap{padding:16px 12px 60px}
+  .top{padding:8px 12px;position:static}
+}
+@media print{
+  :root{padding:0}
+  .top{display:none}
+  .slide{display:grid !important;grid-template-columns:1fr;break-after:page;gap:14px}
+  .script{display:block !important}
+  .card{min-height:0}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Intelligenza artificiale: il corso in sintesi</div>
+  <nav class="strip" id="strip" aria-label="Sezioni del corso"></nav>
+  <div class="tools">
+    <select id="idx" aria-label="Vai alla slide"></select>
+    <button class="btn" id="tg" type="button">Nascondi copione</button>
+    <button class="btn" id="prev" type="button">Indietro</button>
+    <button class="btn" id="next" type="button">Avanti</button>
+    <span class="count" id="cnt" aria-live="polite"></span>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<script>
+const SEC=[
+ {n:'Apertura',c:'#8AA0AE'},
+ {n:'Fondamenti',c:'#E8412D'},
+ {n:'Machine learning',c:'#F28A1E'},
+ {n:'Algoritmi',c:'#F2C21E'},
+ {n:'Reti neurali',c:'#5DAE3B'},
+ {n:'Applicazioni',c:'#1FA6A0'},
+ {n:'IA generativa',c:'#2F6BD8'},
+ {n:'Etica e società',c:'#6A3FB5'},
+ {n:'Appendice',c:'#8AA0AE'}
+];
+const li=a=>`<ul class="k">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+const flow=(a,sep='→')=>`<div class="flow">${a.map((x,i)=>(i?`<span class="a" aria-hidden="true">${sep}</span>`:'')+`<span class="n">${x}</span>`).join('')}</div>`;
+const tl=a=>`<div class="tl">${a.map(r=>`<div class="r"><span class="y">${r[0]}</span><span>${r[1]}</span></div>`).join('')}</div>`;
+const box=(t,p,tag)=>`<div class="box"><h4>${t}${tag?`<span class="tag">${tag}</span>`:''}</h4>${p.split('|').map(x=>`<p>${x}</p>`).join('')}</div>`;
+
+function net(L,w=460,h=210,label='Rete neurale'){
+  const px=40,py=26,gx=(w-2*px)/(L.length-1);
+  const pos=L.map((n,i)=>{const gy=Math.min(46,(h-2*py)/Math.max(n-1,1));return Array.from({length:n},(_,j)=>[px+i*gx,h/2-((n-1)*gy)/2+j*gy]);});
+  let e='',v='';
+  for(let i=0;i<L.length-1;i++)for(const a of pos[i])for(const b of pos[i+1])e+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`;
+  pos.forEach((col,i)=>col.forEach(p=>{v+=`<circle cx="${p[0]}" cy="${p[1]}" r="10" class="${(i==0||i==L.length-1)?'io':'hid'}"/>`;}));
+  const hx=L.length>2?(2*px+(L.length-1)*gx)/2:(w/2);
+  return `<svg class="dg" viewBox="0 0 ${w} ${h+26}" role="img" aria-label="${label}"><g class="ed">${e}</g>${v}<text x="${px}" y="${h+16}" text-anchor="middle" class="m">Input</text><text x="${hx}" y="${h+16}" text-anchor="middle" class="m">Strati nascosti</text><text x="${w-px}" y="${h+16}" text-anchor="middle" class="m">Output</text></svg>`;
+}
+function mp(){
+  const v=[[1,3,2,4],[5,6,1,2],[7,2,9,1],[3,4,5,8]],mx=[6,4,7,9];let g='';
+  v.forEach((r,y)=>r.forEach((x,i)=>{const q=(y>>1)*2+(i>>1);g+=`<span class="${(q==0||q==3)?'ta':''}${x===mx[q]?' mx':''}">${x}</span>`;}));
+  return `<div class="mp"><div class="g4" role="img" aria-label="Griglia 4 per 4 di valori">${g}</div><span class="a">max di ogni blocco 2×2</span><div class="g2" role="img" aria-label="Risultato 2 per 2"><span>6</span><span>4</span><span>7</span><span>9</span></div></div>`;
+}
+
+const svgReg=`<svg class="dg" viewBox="0 0 320 210" role="img" aria-label="Punti dati, retta di regressione ed errore residuo">
+<line class="ax" x1="30" y1="182" x2="308" y2="182"/><line class="ax" x1="30" y1="12" x2="30" y2="182"/>
+<line class="fit" x1="36" y1="160" x2="300" y2="32"/>
+<line class="res" x1="200" y1="80" x2="200" y2="98"/>
+<g class="pt"><circle cx="50" cy="146" r="4.5"/><circle cx="75" cy="150" r="4.5"/><circle cx="100" cy="128" r="4.5"/><circle cx="125" cy="120" r="4.5"/><circle cx="150" cy="118" r="4.5"/><circle cx="175" cy="92" r="4.5"/><circle cx="200" cy="98" r="4.5"/><circle cx="225" cy="72" r="4.5"/><circle cx="250" cy="60" r="4.5"/><circle cx="280" cy="48" r="4.5"/></g>
+<text x="208" y="94">ε</text><text x="306" y="200" text-anchor="end" class="m">X (variabile indipendente)</text><text x="38" y="22" class="m">Y (valore da prevedere)</text></svg>`;
+
+const svgSig=`<svg class="dg" viewBox="0 0 320 210" role="img" aria-label="Curva a S della funzione logistica con soglia a 0,5">
+<line class="ax" x1="34" y1="182" x2="308" y2="182"/><line class="ax" x1="34" y1="12" x2="34" y2="182"/>
+<line class="ld" x1="34" y1="110" x2="308" y2="110"/>
+<path class="fit" d="M36,178 C110,178 130,176 160,110 C190,44 210,42 304,42" fill="none"/>
+<text x="24" y="46" text-anchor="end">1</text><text x="24" y="185" text-anchor="end">0</text><text x="24" y="114" text-anchor="end">0,5</text>
+<text x="306" y="104" text-anchor="end" class="m">soglia</text><text x="306" y="200" text-anchor="end" class="m">combinazione delle variabili X</text><text x="40" y="22" class="m">probabilità</text></svg>`;
+
+const svgSvm=`<svg class="dg" viewBox="0 0 320 200" role="img" aria-label="Due classi di punti separate da una linea con margine e vettori di supporto">
+<line class="ld" x1="130" y1="14" x2="120" y2="186"/><line class="ld" x1="200" y1="14" x2="190" y2="186"/>
+<line class="ln" x1="165" y1="14" x2="155" y2="186" style="stroke-width:2.6"/>
+<g style="fill:var(--sc);stroke:var(--ink);stroke-width:1.3"><circle cx="50" cy="50" r="6"/><circle cx="75" cy="95" r="6"/><circle cx="60" cy="140" r="6"/><circle cx="95" cy="65" r="6"/><circle cx="98" cy="120" r="6"/><circle cx="88" cy="165" r="6"/><circle cx="112" cy="40" r="6"/><circle cx="126" cy="95" r="6"/></g>
+<g style="fill:var(--ink)"><rect x="210" y="45" width="11" height="11"/><rect x="235" y="100" width="11" height="11"/><rect x="250" y="70" width="11" height="11"/><rect x="266" y="145" width="11" height="11"/><rect x="226" y="155" width="11" height="11"/><rect x="232" y="30" width="11" height="11"/><rect x="188.5" y="114.5" width="11" height="11"/><rect x="192.5" y="54.5" width="11" height="11"/></g>
+<g style="fill:none;stroke:var(--ink);stroke-width:1.3;stroke-dasharray:3 2"><circle cx="126" cy="95" r="11"/><circle cx="194" cy="120" r="11"/><circle cx="198" cy="60" r="11"/></g>
+<text x="168" y="12" class="m">iperpiano</text><text x="132" y="197" class="m">vettori di supporto cerchiati</text></svg>`;
+
+const svgKm=`<svg class="dg" viewBox="0 0 320 210" role="img" aria-label="Clienti raggruppati in tre cluster con i rispettivi centroidi">
+<line class="ax" x1="30" y1="184" x2="308" y2="184"/><line class="ax" x1="30" y1="12" x2="30" y2="184"/>
+<g style="fill:#2F6BD8"><circle cx="50" cy="155" r="5"/><circle cx="70" cy="165" r="5"/><circle cx="85" cy="145" r="5"/><circle cx="60" cy="135" r="5"/><circle cx="95" cy="160" r="5"/></g>
+<g style="fill:#1FA6A0"><circle cx="140" cy="105" r="5"/><circle cx="160" cy="90" r="5"/><circle cx="175" cy="115" r="5"/><circle cx="150" cy="120" r="5"/><circle cx="185" cy="100" r="5"/></g>
+<g style="fill:#6A3FB5"><circle cx="235" cy="55" r="5"/><circle cx="255" cy="40" r="5"/><circle cx="275" cy="60" r="5"/><circle cx="245" cy="75" r="5"/><circle cx="280" cy="35" r="5"/></g>
+<g style="stroke:var(--ink);stroke-width:2.5"><path d="M67 147l10 10M77 147l-10 10"/><path d="M157 101l10 10M167 101l-10 10"/><path d="M253 48l10 10M263 48l-10 10"/></g>
+<text x="40" y="180" class="m">occasionali</text><text x="150" y="82" class="m">regolari</text><text x="228" y="26" class="m">premium</text>
+<text x="306" y="201" text-anchor="end" class="m">frequenza di acquisto</text><text x="38" y="22" class="m">spesa annua</text></svg>`;
+
+const svgTree=`<svg class="dg" viewBox="0 0 530 290" role="img" aria-label="Albero decisionale sull’esempio del tennis">
+<g class="ln"><path d="M180 47L70 93"/><path d="M180 47L290 93"/><path d="M290 127L200 173"/><path d="M290 127L400 173"/><path d="M400 207L340 248"/><path d="M400 207L450 248"/></g>
+<rect class="bx" x="105" y="13" width="150" height="34" rx="4"/><text x="180" y="35" text-anchor="middle">È soleggiato?</text>
+<rect class="bs" x="25" y="93" width="90" height="34" rx="4"/><text x="70" y="115" text-anchor="middle">Gioca</text>
+<rect class="bx" x="225" y="93" width="130" height="34" rx="4"/><text x="290" y="115" text-anchor="middle">Sta piovendo?</text>
+<rect class="bs" x="145" y="173" width="110" height="34" rx="4"/><text x="200" y="195" text-anchor="middle">Non giocare</text>
+<rect class="bx" x="310" y="173" width="180" height="34" rx="4"/><text x="400" y="195" text-anchor="middle">Rimborso se piove?</text>
+<rect class="bs" x="300" y="248" width="80" height="34" rx="4"/><text x="340" y="270" text-anchor="middle">Gioca</text>
+<rect class="bs" x="395" y="248" width="110" height="34" rx="4"/><text x="450" y="270" text-anchor="middle">Non giocare</text>
+<text x="108" y="66" class="m">sì</text><text x="240" y="66" class="m">no</text><text x="234" y="148" class="m">sì</text><text x="352" y="148" class="m">no</text><text x="360" y="232" class="m">sì</text><text x="434" y="232" class="m">no</text>
+<text x="264" y="34" class="m">radice</text><text x="362" y="114" class="m">nodo interno</text><text x="25" y="146" class="m">foglia</text></svg>`;
+
+const svgGan=`<svg class="dg" viewBox="0 0 600 220" role="img" aria-label="Schema di una rete generativa avversaria">
+<defs><marker id="ahG" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L8,4L0,8z"/></marker></defs>
+<rect class="bx" x="8" y="20" width="120" height="44" rx="4"/><text x="68" y="39" text-anchor="middle">Vettore</text><text x="68" y="54" text-anchor="middle">casuale</text>
+<rect class="bs" x="170" y="20" width="120" height="44" rx="4"/><text x="230" y="47" text-anchor="middle">Generatore</text>
+<rect class="bx" x="330" y="20" width="120" height="44" rx="4"/><text x="390" y="39" text-anchor="middle">Immagine</text><text x="390" y="54" text-anchor="middle">falsa</text>
+<rect class="bs" x="480" y="88" width="112" height="56" rx="4"/><text x="536" y="112" text-anchor="middle">Discriminatore</text><text x="536" y="128" text-anchor="middle" class="m" style="fill:var(--ink)">reale o falso?</text>
+<rect class="bx" x="330" y="150" width="120" height="44" rx="4"/><text x="390" y="169" text-anchor="middle">Immagini reali</text><text x="390" y="184" text-anchor="middle">(dataset)</text>
+<path class="ln" d="M128 42H168" marker-end="url(#ahG)"/><path class="ln" d="M290 42H328" marker-end="url(#ahG)"/>
+<path class="ln" d="M450 42H536V86" marker-end="url(#ahG)"/><path class="ln" d="M450 172H536V146" marker-end="url(#ahG)"/>
+<path class="ld" d="M480 116H230V66" marker-end="url(#ahG)"/>
+<text x="352" y="108" text-anchor="middle" class="m">feedback: perché era falso</text></svg>`;
+
+const svgRl=`<svg class="dg" viewBox="0 0 460 200" role="img" aria-label="Ciclo di apprendimento per rinforzo tra agente e ambiente">
+<defs><marker id="ahR" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L8,4L0,8z"/></marker></defs>
+<rect class="bs" x="20" y="70" width="120" height="60" rx="4"/><text x="80" y="105" text-anchor="middle">Agente</text>
+<rect class="bx" x="320" y="70" width="120" height="60" rx="4"/><text x="380" y="105" text-anchor="middle">Ambiente</text>
+<path class="ln" d="M80 70V38H380V68" marker-end="url(#ahR)"/><text x="230" y="30" text-anchor="middle">azione</text>
+<path class="ln" d="M380 132V164H82V134" marker-end="url(#ahR)"/><text x="230" y="184" text-anchor="middle">ricompensa (+1) o penalità (−1)</text></svg>`;
+
+const svgRnn=`<svg class="dg" viewBox="0 0 520 190" role="img" aria-label="Rete ricorrente srotolata su tre passi">
+<defs><marker id="ahN" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L8,4L0,8z"/></marker></defs>
+<rect class="bs" x="30" y="66" width="110" height="46" rx="4"/><text x="85" y="94" text-anchor="middle">Stato</text>
+<rect class="bs" x="205" y="66" width="110" height="46" rx="4"/><text x="260" y="94" text-anchor="middle">Stato</text>
+<rect class="bs" x="380" y="66" width="110" height="46" rx="4"/><text x="435" y="94" text-anchor="middle">Stato</text>
+<path class="ln" d="M140 89H203" marker-end="url(#ahN)"/><path class="ln" d="M315 89H378" marker-end="url(#ahN)"/>
+<text x="172" y="80" text-anchor="middle" class="m">memoria</text><text x="347" y="80" text-anchor="middle" class="m">memoria</text>
+<path class="ln" d="M85 158V114" marker-end="url(#ahN)"/><path class="ln" d="M260 158V114" marker-end="url(#ahN)"/><path class="ln" d="M435 158V114" marker-end="url(#ahN)"/>
+<text x="85" y="176" text-anchor="middle">«non»</text><text x="260" y="176" text-anchor="middle">«è stato»</text><text x="435" y="176" text-anchor="middle">«affatto male»</text>
+<path class="ln" d="M435 66V32" marker-end="url(#ahN)"/><text x="435" y="22" text-anchor="middle">giudizio positivo</text></svg>`;
+
+const S=[];
+S.push(
+{sec:0,cls:'hero',title:'Intelligenza artificiale',
+ body:`<p class="lead">Dal machine learning all’IA generativa: il corso in sintesi, con il testo per spiegarlo.</p>
+ <div class="bigstrip">${SEC.slice(1,8).map(s=>`<span style="--c:${s.c}">${s.n}</span>`).join('')}</div>
+ <p class="small">Sintesi ragionata del Corso di Intelligenza Artificiale.</p>`,
+ say:`<p>Questa presentazione ripercorre l’intero corso, dalla storia dell’IA fino a etica e società. Le sette fasce colorate sono le sette sezioni: le ritrovi in alto in ogni slide, come una striscia di indicatori di pH, dal rosso dei fondamenti al viola delle questioni etiche.</p><p>A sinistra c’è la slide, qui accanto il testo da cui puoi argomentare, scritto per essere detto a voce senza bisogno di cercare altro. Tasti utili: frecce per spostarsi, <b>S</b> per nascondere il copione quando proietti.</p>`,
+ prec:`<p>I blocchi «Precisazione» e «Esempio per il laboratorio» sono integrazioni rispetto al corso: correzioni di date o dati, aggiornamenti successivi e collegamenti con il lavoro in laboratorio. Tutto il resto è la sintesi di ciò che il corso dice.</p>`},
+
+{sec:0,title:'Mappa del corso',
+ body:`${li([
+  '<b>Fondamenti</b>: definizione, storia, tipi di IA, sistemi esperti',
+  '<b>Machine learning</b>: apprendimento supervisionato, non supervisionato, semi-supervisionato, per rinforzo',
+  '<b>Algoritmi</b>: regressione lineare e logistica, SVM, K-means, alberi decisionali e Random Forest',
+  '<b>Reti neurali</b>: reti profonde, deep learning, convoluzionali e ricorrenti',
+  '<b>Applicazioni</b>: robotica, computer vision, elaborazione del linguaggio naturale',
+  '<b>IA generativa</b>: ChatGPT e simili, GAN, deepfake',
+  '<b>Etica e società</b>: bias, spiegabilità, lavoro, privacy'])}`,
+ say:`<p>Il percorso parte dal generale, entra nel dettaglio tecnico e poi torna al generale. Si comincia con storia e definizioni, si passa al machine learning e ai suoi algoritmi, si sale alle reti neurali profonde e si vedono le applicazioni: robotica, visione, linguaggio. Poi arriva l’IA generativa e infine la riflessione critica su etica, privacy e impatto sociale.</p><p>Il corso è pensato per chi si avvicina alla materia: l’obiettivo è dare una base teorica e pratica che si possa usare subito.</p>`},
+
+{sec:0,title:'Perché parlarne',
+ body:`${li([
+  'Secondo le stime citate nel corso, oltre <b>5 miliardi di persone</b> dovranno adattare la propria professione alla nuova realtà',
+  'L’IA può rivoluzionare molti settori dell’economia e della società',
+  'Ma molti modelli di deep learning sono <b>black box</b>: milioni di parametri, decisioni difficili da interpretare',
+  'Da qui i dubbi sulle implicazioni etiche di quelle decisioni',
+  'Scopo del corso: una base teorica e pratica da usare subito'])}`,
+ say:`<p>Il punto di partenza è doppio. Da un lato l’IA sta portando cambiamenti radicali in molti settori; dall’altro i modelli più potenti sono anche i meno trasparenti, perché prendono decisioni con milioni di parametri che nessuno riesce a leggere direttamente.</p><p>Per questo il corso non si limita alla tecnica: chiude con etica, privacy e impatto economico. Per chi lavora in laboratorio il messaggio è pratico: capire come funziona lo strumento permette di usarlo bene e di riconoscerne i limiti.</p>`,
+ prec:`<p>Entro il 2030: Gli analisti stimano che tra l'80% e l'85% della popolazione mondiale con accesso a Internet utilizzerà l'intelligenza artificiale. La maggior parte delle interazioni avverrà in modo automatico attraverso assistenti vocali, sistema operativo dello smartphone, ricerca web ed elettrodomestici smart.</p><p>Integrazione aziendale: Oltre il 78-90% delle aziende a livello globale ha già integrato o sta implementando soluzioni basate su AI nei propri processi operativi (dall'assistenza clienti al coding fino al marketing).</p></p><p>Fonte OCSE</P>`},
+
+{sec:1,title:'Che cos’è l’intelligenza artificiale',
+ body:`<p class="lead">La capacità di una macchina di imitare il comportamento dell’uomo.</p>${li([
+  'Si abbrevia <b>IA</b> (in inglese AI)',
+  'Riguarda la creazione di computer che pensano e apprendono come gli esseri umani',
+  'È come dotare il computer di una sorta di mente',
+  'Risolve problemi o esegue compiti <b>senza essere istruita passo per passo</b>'])}`,
+ say:`<p>Un modo semplice per dirlo: si dà al computer una specie di mente. Un programma tradizionale segue istruzioni scritte da un programmatore in ogni dettaglio; un sistema di IA riceve un obiettivo e dei dati e trova da solo come raggiungerlo.</p><p>La definizione del corso è volutamente intuitiva e mette l’accento sul comportamento: la macchina imita ciò che farebbe una persona.</p>`,
+ prec:`<p>«Imitare il comportamento umano» non significa che la macchina capisca o provi qualcosa. Il test di Turing (slide successiva) misura solo se il comportamento è indistinguibile da quello di una persona.</p>`},
+
+{sec:1,title:'Storia: dall’idea alla realtà',
+ body:tl([
+  ['1950','Alan Turing propone il <b>test di Turing</b>: una macchina è intelligente se le sue risposte sono indistinguibili da quelle di un umano'],
+  ['1956','Conferenza al Dartmouth College: John McCarthy introduce il termine «intelligenza artificiale»'],
+  ['1966','<b>ELIZA</b>: simula uno psicologo con regole e pattern, illusione di conversazione umana'],
+  ['1968','Il film «2001: Odissea nello spazio» presenta <b>HAL 9000</b>, computer con coscienza ed emozioni'],
+  ['1997','<b>Deep Blue</b> (IBM) sconfigge il campione di scacchi Garry Kasparov'],
+  ['2012','<b>AlexNet</b> (Krizhevsky, Sutskever, Hinton, Toronto): rete neurale profonda per il riconoscimento di immagini'],
+  ['2020','OpenAI lancia <b>GPT-3</b>; emergono Midjourney e DeepFaceLab']]),
+ say:`<p>La storia dell’IA è il passaggio da un’idea visionaria a una realtà concreta. Nel 1950 Turing propone il suo test: se non riesci a distinguere le risposte della macchina da quelle di una persona, la macchina può dirsi intelligente. Nel 1956, al Dartmouth College, McCarthy conia il termine «intelligenza artificiale»: è la nascita ufficiale della disciplina.</p><p>Nel 1966 ELIZA imita uno psicologo con regole e schemi predefiniti e dà l’illusione di una conversazione umana, pur senza superare il test di Turing; è una svolta per l’elaborazione del linguaggio naturale. Nel 1968 il cinema porta HAL 9000 nell’immaginario collettivo.</p><p>Nel 1997 Deep Blue batte Kasparov: per la prima volta una macchina compete con successo in un’attività dominata dalla mente umana. Nel 2012 AlexNet dimostra il valore delle reti neurali profonde nel riconoscere immagini. Nel 2020 arriva GPT-3, che permette di conversare con una macchina, e con Midjourney e DeepFaceLab crescono anche le preoccupazioni etiche.</p>`,
+ prec:`<p>Sul match del 1997 il corso riporta un punteggio di tre vittorie a due con una patta. Il dato storico è 3,5 a 2,5: due vittorie di Deep Blue, una di Kasparov, tre patte. Il significato non cambia. Per DeepFaceLab il corso indica più avanti il lancio ad aprile 2019, quindi poco prima del 2020 citato qui.</p>`},
+
+{sec:1,title:'Tre tipi di intelligenza artificiale',
+ body:`<div class="cols3">
+ ${box('IA limitata','Opera in ambiti definiti|Funziona con algoritmi matematici e statistici|Esempi: app per smartphone, Google Translate, filtri antispam, riconoscimento di voce e immagini','in uso oggi')}
+ ${box('IA generale','Emula l’intelligenza umana|Può eseguire qualsiasi compito intellettuale umano, ragionamento e problem solving compresi')}
+ ${box('Superintelligenza','Capacità che superano quelle umane|Previsione del corso: entro il 2050 in vari campi|Esempio: medicina personalizzata, con DNA, abitudini e ambiente per prevenire malattie e creare farmaci su misura','visione futura')}
+ </div>`,
+ say:`<p>Attenzione all’aggettivo «limitata»: non vuol dire scarsa, vuol dire specializzata. Un sistema di IA limitata sembra prendere decisioni, ma in realtà applica calcoli matematici o statistici a un compito circoscritto: riconoscere un oggetto, tradurre una frase, filtrare la posta indesiderata.</p><p>L’IA generale sarebbe invece un sistema capace di fare qualsiasi cosa possa fare la mente umana. La superintelligenza è la visione più avanzata: sistemi che superano le capacità umane. Il corso ne dà un esempio concreto in medicina, con cure ottimizzate in tempo reale per ogni singolo paziente.</p>`,
+ prec:`<p>Nella classificazione del corso tutte le applicazioni viste nel resto del percorso (visione, traduzione, chatbot) sono IA limitata. IA generale e superintelligenza restano ipotesi e obiettivi di ricerca: la data del 2050 è una previsione del corso, non un dato, e sulle tempistiche gli esperti non concordano.</p>`},
+
+{sec:1,title:'Sistemi esperti',
+ body:`${flow(['Utente','Interfaccia utente','Motore di inferenza','Base di conoscenza'],'⇄')}${li([
+  '<b>Base di conoscenza</b>: regole e procedure raccolte da un esperto, il «libro delle regole»',
+  '<b>Motore di inferenza</b>: il «cervello» che usa le regole per trarre conclusioni',
+  '<b>Interfaccia utente</b>: dove si inseriscono i dati e si ricevono le risposte',
+  'Usi: <b>medicina</b> (diagnosi e trattamenti), <b>finanza</b> (investimenti e rischio), <b>meteorologia</b> (previsioni)'])}`,
+ say:`<p>I sistemi esperti sono tra i rami più antichi e consolidati dell’IA. Simulano la capacità decisionale di un esperto umano in un campo di conoscenza ben preciso. Il funzionamento è lineare: l’utente sottopone un problema, il sistema analizza il caso con la sua base di conoscenza e il suo motore di inferenza e restituisce una soluzione o una raccomandazione, come farebbe l’esperto.</p><p>Nonostante la loro storicità restano preziosi: in medicina aiutano a diagnosticare malattie e a suggerire trattamenti, in finanza a valutare investimenti e rischio, in meteorologia a prevedere le condizioni atmosferiche.</p>`,
+ prec:`<p>Differenza chiave con il machine learning della sezione successiva: nei sistemi esperti le regole le scrive un esperto; nel machine learning le ricava la macchina dai dati.</p>`,
+ lab:`<p>Un manuale di risoluzione guasti di uno strumento, trascritto come regole «se… allora…», è un sistema esperto in piccolo.</p>`},
+
+{sec:2,title:'Machine learning: imparare dai dati',
+ body:`<p class="lead">Il settore dell’IA che permette ai computer di apprendere direttamente dai dati, senza programmazione esplicita.</p>
+ <div class="cols2">${box('Dati (dataset)','Collezione strutturata di dati che si dà in pasto al sistema per addestrarlo. Nel ML sono i dati, più della programmazione, a stare al centro.')}${box('Algoritmi','Sequenze di istruzioni: gli «ingranaggi» del cervello digitale. Si affinano man mano che arrivano nuovi dati.')}</div>
+ ${li(['Analogia: i dati sono i libri di uno studente, più sono completi e vari e più la comprensione è precisa','Risultato (output): una <b>classificazione</b>, una <b>clusterizzazione</b> o delle <b>previsioni</b>'])}`,
+ say:`<p>Il machine learning, o apprendimento automatico, è un sottoinsieme dell’IA. Lo si può immaginare come un grande cervello digitale che poggia su due pilastri: i dati e gli algoritmi. È un cambio di prospettiva importante: in gran parte dell’informatica il protagonista è il programma scritto dall’uomo, qui il protagonista è il dataset.</p><p>Le varie forme di machine learning si distinguono soprattutto per come i dati vengono presentati alla macchina: accompagnati da etichette oppure no. È il tema delle prossime slide.</p>`,
+ prec:`<p>Regola pratica da ricordare: un modello non può essere migliore dei dati con cui è stato addestrato. Lo riprenderemo parlando di bias.</p>`},
+
+{sec:2,title:'Apprendimento supervisionato',
+ body:`${flow(['Dataset etichettato<br><small>foto + «gatto» / «cane»</small>','Addestramento<br><small>training</small>','Modello','Testing<br><small>foto mai viste</small>','Classificazione'])}${li([
+  'Dati <b>etichettati</b>: ogni elemento ha la risposta corretta',
+  'Più dati di training, risultati più accurati',
+  'La macchina individua <b>pattern</b>: insiemi di caratteristiche distintive (es. orecchie appuntite = gatto)',
+  'Sulle foto nuove cerca gli stessi pattern per fare una previsione'])}`,
+ say:`<p>Nel supervisionato diamo alla macchina dati etichettati, cioè dati in cui ogni elemento porta con sé la risposta giusta. Se vogliamo riconoscere gatti e cani, ogni immagine del dataset è marcata «gatto» o «cane». Durante l’addestramento la macchina analizza le foto e individua i pattern: per esempio che i gatti tendono ad avere orecchie più appuntite.</p><p>Poi arriva il testing: le mostriamo foto che non ha mai visto e verifichiamo se le classifica correttamente. L’output è una classificazione. Il riconoscimento di immagini è uno dei campi più popolari, ma è solo uno dei tanti.</p>`,
+ prec:`<p>Il testing su dati mai visti è il controllo di qualità del modello: se lo si verificasse sulle stesse immagini usate per l’addestramento, non si saprebbe se ha imparato o se ha solo memorizzato.</p>`,
+ lab:`<p>È come tarare uno strumento con campioni certificati (dati etichettati) e poi verificarlo su campioni ignoti.</p>`},
+
+{sec:2,title:'Apprendimento non supervisionato',
+ body:`${flow(['Foto miste<br><small>senza etichette</small>','Ricerca di somiglianze e pattern','Gruppi (cluster)'])}${li([
+  'I dati sono <b>privi di etichetta</b>: nessuna indicazione sulla risposta corretta',
+  'Il sistema impara da solo le differenze',
+  'Output diverso: non «gatto» o «cane», ma <b>cluster</b> di immagini simili',
+  'Criteri trovati dalla macchina: forma delle orecchie, colore del pelo…'])}`,
+ say:`<p>Cambia il tipo di dati in ingresso: qui non diciamo alla macchina che cosa rappresenta ciascuna immagine. Le diamo un insieme misto di foto di gatti e cani e lasciamo che sia lei a cercare somiglianze e pattern.</p><p>Il risultato non è una classificazione ma un raggruppamento: la macchina forma insiemi, i cluster, basandosi sui pattern che ha trovato, come la forma delle orecchie o il colore del pelo. Non sa come si chiamano i gruppi: sa solo che gli elementi dentro a ciascuno si somigliano.</p>`,
+ lab:`<p>Raggruppare misure o spettri simili senza sapere in anticipo a quale famiglia appartengono.</p>`},
+
+{sec:2,title:'Apprendimento semi-supervisionato',
+ body:`<div class="bar" role="img" aria-label="Una piccola parte di dati etichettati e la maggior parte non etichettati"><span class="l">poche etichette</span><span class="u">molti dati senza etichetta</span></div>${li([
+  'Approccio <b>ibrido</b> tra supervisionato e non supervisionato',
+  'Si usano insieme dati etichettati (piccola parte) e non etichettati (la maggior parte)',
+  'Dalle foto etichettate la macchina <b>inferisce</b> informazioni anche su quelle senza etichetta',
+  'Obiettivo: un modello più preciso e robusto di entrambi gli approcci puri'])}`,
+ say:`<p>Il semi-supervisionato si colloca in mezzo. Alla macchina forniamo sia dati etichettati sia dati non etichettati, ma con una proporzione precisa: solo una piccola parte è etichettata, la gran parte no.</p><p>Nell’esempio di cani e gatti, etichettiamo una frazione delle foto. L’esperienza maturata su quelle permette alla macchina di dedurre qualcosa anche sulle altre, individuando somiglianze con le immagini già etichettate. Utilizzando l’intero dataset, le previsioni su foto future dovrebbero essere più accurate.</p>`,
+ prec:`<p>Il vantaggio pratico è di costo: etichettare i dati richiede tempo di persone competenti, quindi averne poche di etichettate e molte di grezze è la situazione più comune.</p>`},
+
+{sec:2,title:'Apprendimento per rinforzo',
+ body:`${svgRl}${li([
+  'Protagonista: l’<b>agente</b> (un robot o un software) che interagisce con l’ambiente',
+  'Azione corretta: <b>ricompensa</b>. Azione sbagliata: <b>penalità</b>',
+  'Apprende per tentativi, errori e correzioni fino alla migliore strategia (<b>policy</b>)',
+  'Usi: robotica (camminare, azioni specifiche), raccomandazioni di YouTube e Netflix'])}`,
+ say:`<p>Qui la logica è diversa: niente dati etichettati e niente ricerca di pattern, ma ricompense e penalità. L’agente compie un’azione nell’ambiente e riceve un riscontro; guidato da questo feedback si perfeziona con un ciclo continuo di tentativi, errori e correzioni.</p><p>L’esempio del corso: un robot deve mettere il cibo per gatti e per cani in due ciotole diverse, ma all’inizio non sa quale sia quale. Ogni volta che sbaglia perde un punto, ogni volta che azzecca ne guadagna uno. All’inizio agisce a caso, poi migliora. L’obiettivo finale è trovare la policy che massimizza le ricompense nel lungo periodo.</p><p>Applicazioni: nella robotica per insegnare compiti come camminare; su YouTube e Netflix, dove l’agente prova diverse proposte e riceve una ricompensa quando l’utente reagisce bene.</p>`},
+
+{sec:2,title:'I quattro approcci a confronto',
+ body:`<div class="tw"><table class="t"><thead><tr><th>Approccio</th><th>Dati in ingresso</th><th>Output</th><th>Esempio del corso</th></tr></thead><tbody>
+ <tr><td>Supervisionato</td><td>Etichettati</td><td>Classificazione o previsione</td><td>Foto classificate come gatto o cane</td></tr>
+ <tr><td>Non supervisionato</td><td>Senza etichette</td><td>Cluster</td><td>Foto raggruppate per somiglianza</td></tr>
+ <tr><td>Semi-supervisionato</td><td>Pochi etichettati, molti no</td><td>Modello più preciso e robusto</td><td>Poche foto etichettate aiutano a classificare le altre</td></tr>
+ <tr><td>Per rinforzo</td><td>Nessun dataset: interazione con l’ambiente</td><td>Policy che massimizza le ricompense</td><td>Robot che serve le ciotole giuste</td></tr></tbody></table></div>`,
+ say:`<p>Per orientarsi basta una domanda: che cosa entra nel sistema? Se sono dati con la risposta giusta, è supervisionato. Se sono dati senza risposte, è non supervisionato. Se è un mix con poche risposte, è semi-supervisionato. Se non ci sono dati ma un ambiente che dà ricompense e penalità, è per rinforzo.</p><p>Da questa distinzione dipende anche l’output: classificazioni e previsioni, gruppi, un modello più robusto, oppure una strategia di comportamento.</p>`},
+
+{sec:3,title:'Gli algoritmi: ricette per imparare',
+ body:`<p class="lead">Sequenze di istruzioni o procedure matematiche che, applicate ai dati, permettono a un sistema di imparare.</p>
+ <div class="cols3">${box('Regressione','Prevedere un valore numerico continuo.|Regressione lineare')}${box('Classificazione','Assegnare un elemento a una categoria.|Regressione logistica, SVM, alberi decisionali, Random Forest')}${box('Clustering','Scoprire gruppi di elementi simili.|K-means')}</div>${li(['Sono le «ricette» con cui il computer apprende dai dati','Permettono di fare previsioni o prendere decisioni senza essere stati programmati in quel senso'])}`,
+ say:`<p>Gli algoritmi di machine learning sono come ricette: dicono passo per passo come trasformare i dati in conoscenza. Ne esistono moltissimi, e in genere si classificano in base al tipo di apprendimento che supportano o al problema che risolvono.</p><p>Il corso si concentra sui più noti, raggruppati per tipo di problema: regressione, classificazione e clustering. Le prossime cinque slide li presentano con un esempio ciascuno.</p>`,
+ prec:`<p>La regressione logistica, nonostante il nome, serve a classificare (due classi): il corso la presenta appunto per la classificazione binaria.</p>`},
+
+{sec:3,title:'Regressione lineare',
+ body:`${svgReg}${li([
+  'Apprendimento <b>supervisionato</b>: prevede una variabile continua <b>Y</b> a partire da una o più variabili indipendenti <b>X</b>',
+  'Una variabile: una <b>retta</b>. Due: un <b>piano</b>. Tre o più: un <b>iperpiano</b>',
+  'Esempio: prezzo di un appartamento da superficie, anno di costruzione e numero di stanze'])}
+ <div class="eq">Y = β₀ + β₁·X₁ + β₂·X₂ + β₃·X₃ + ε</div>
+ <p class="small">ε è l’errore residuo, i coefficienti β indicano l’importanza di ogni variabile.</p>`,
+ say:`<p>La regressione lineare cerca la retta che meglio si adatta ai dati. Prendiamo un appartamento di 100 metri quadri, costruito nel 2010, con tre stanze: abbiamo tre variabili indipendenti e vogliamo stimarne il prezzo Y. Alimentiamo il modello con dati storici del mercato immobiliare e poi lo usiamo per la stima.</p><p>Nell’equazione, i coefficienti beta dicono quanto pesa ciascuna variabile e epsilon è l’errore residuo, cioè la differenza fra ciò che è stato osservato e ciò che il modello prevede. Con tre variabili il modello non è più una retta ma un iperpiano. Grazie alla sua chiarezza e semplicità è uno strumento estremamente versatile.</p>`,
+ lab:`<p>La curva di taratura, con la risposta dello strumento in funzione della concentrazione, è una regressione lineare.</p>`},
+
+{sec:3,title:'Regressione logistica',
+ body:`${svgSig}${li([
+  'Apprendimento <b>supervisionato</b> per la <b>classificazione binaria</b>: output 0 o 1, sì o no',
+  'Il risultato è una <b>probabilità</b> tra 0 e 1; oltre la soglia (di solito 0,5) si assegna la classe positiva',
+  'Esempio: malattia cardiaca da colesterolo, pressione, età e sesso',
+  'È una stima probabilistica, non una certezza: supporta le decisioni dei medici'])}`,
+ say:`<p>Qui non si prevede un numero qualsiasi ma una scelta tra due possibilità. Nell’esempio del corso vogliamo prevedere se un paziente ha una malattia cardiaca: Y vale 1 se ce l’ha e 0 se non ce l’ha; le variabili sono colesterolo, pressione, età e sesso.</p><p>Dopo l’addestramento con dati storici, il modello restituisce una probabilità. Se supera la soglia, di solito 0,5, il paziente viene classificato come malato. Va sottolineato che non conferma la malattia con assoluta certezza: dà una stima, utile al medico per decidere.</p><p>Con una sola variabile la funzione logistica ha la caratteristica forma a S, la sigmoide. Con molte variabili non è visualizzabile in un grafico piano, quindi nella pratica si interpretano soprattutto i coefficienti.</p>`},
+
+{sec:3,title:'Macchine a vettori di supporto (SVM)',
+ body:`${svgSvm}${li([
+  'Apprendimento <b>supervisionato</b> per la <b>classificazione</b>',
+  'Cerca l’<b>iperpiano</b> (una linea in due dimensioni) che separa al meglio le classi',
+  '<b>Vettori di supporto</b>: i punti più vicini all’iperpiano, i più difficili da classificare',
+  'Gestisce anche dati non nettamente separabili'])}`,
+ say:`<p>L’idea è trovare la linea, o l’iperpiano nei casi con più variabili, che divide meglio le classi. I punti decisivi sono quelli più vicini a quel confine: i vettori di supporto. Se riusciamo a classificare correttamente questi, che sono i più ambigui, probabilmente classificheremo bene anche quelli lontani.</p><p>Esempio del corso: una pizzeria con consegna a domicilio che vuole classificare le recensioni come positive o negative. La recensione «La pizza era deliziosa ma ha impiegato troppo tempo ad arrivare» contiene un elemento positivo e uno negativo: è una recensione dubbia, quindi cade vicino al confine e diventa un vettore di supporto. Guardando le recensioni storiche che lamentavano i tempi di consegna, l’algoritmo suggerisce che, pur con un prodotto di qualità, il punto da migliorare è la puntualità.</p>`,
+ prec:`<p>Il corso presenta le SVM come evoluzione avanzata di regressione lineare e logistica. Più precisamente, sono classificatori che cercano l’iperpiano con il <i>margine massimo</i> tra le classi (le due linee tratteggiate nel disegno). Per usarle su un testo bisogna prima trasformarlo in vettore numerico, come accennato nel corso.</p>`},
+
+{sec:3,title:'K-means: il clustering',
+ body:`${svgKm}${li([
+  'Apprendimento <b>non supervisionato</b>: raggruppa dati simili in <b>cluster</b>',
+  '<b>K</b> = numero di cluster; <b>centroide</b> = punto medio del cluster',
+  'Procedura: scegli K, posiziona i centroidi (di solito a caso), assegna ogni punto al più vicino, ricalcola i centroidi come media, ripeti fino a stabilizzazione',
+  'Esempio: profumeria con clienti divisi per spesa e frequenza, K = 3'])}`,
+ say:`<p>K-means è uno degli algoritmi di clustering più conosciuti. L’obiettivo è creare gruppi coerenti al loro interno e distinti tra loro. Si sceglie K, cioè quanti gruppi vogliamo; l’algoritmo sceglie K punti iniziali, assegna ogni dato al centroide più vicino, ricalcola la posizione media dei punti di ogni gruppo e ripete finché i centroidi smettono di spostarsi in modo significativo.</p><p>Esempio: una profumeria con dati storici su quanto spendono i clienti in un anno e con quale frequenza acquistano. Con K uguale a 3 si ottengono tre segmenti: occasionali, regolari, premium. I dati non sono etichettati: è l’algoritmo a scoprire i segmenti, e su ciascuno si possono costruire promozioni mirate.</p>`,
+ prec:`<p>Il valore di K lo sceglie chi progetta l’analisi, non l’algoritmo: nel corso K = 3 è una decisione di partenza. I nomi «occasionali», «regolari», «premium» li assegna poi la persona guardando i gruppi trovati.</p>`,
+ lab:`<p>Raggruppare campioni con profili analitici simili, per esempio per individuare lotti anomali.</p>`},
+
+{sec:3,title:'Alberi decisionali e Random Forest',
+ body:`${svgTree}${li([
+  'Supervisionati, per <b>classificazione</b> e <b>regressione</b>: radice, nodi interni (domande), rami (risposte), foglie (decisione)',
+  'Le domande vanno scelte e ordinate per massimizzare l’informazione (indice di Gini)',
+  '<b>Random Forest</b>: molti alberi, ciascuno addestrato su un diverso sottoinsieme dei dati, con previsioni combinate',
+  'Più accurata e robusta, ma <b>meno interpretabile</b>'])}`,
+ say:`<p>Un albero decisionale funziona come un percorso di domande. Esempio del corso: decidere se giocare a tennis. Prima domanda: è soleggiato? Se sì, si gioca. Se no, si passa alla domanda successiva: sta piovendo? Se sì, non si gioca; altrimenti si guarda un ultimo elemento, ad esempio se l’abbonamento prevede il rimborso in caso di pioggia: con il rimborso si va al campo, senza no.</p><p>Per costruire un albero si scelgono le domande e l’ordine migliore, con metodi come l’indice di Gini che misura e riduce l’incertezza. Una Random Forest combina molti alberi addestrati su parti diverse dei dati: il risultato finale è più accurato e robusto, ma si perde la facilità di lettura.</p>`,
+ prec:`<p>Nell’esempio del tennis la sequenza di domande è didattica. Nella pratica l’ordine delle domande non lo sceglie una persona, ma lo ricava l’algoritmo dai dati.</p>`},
+
+{sec:3,title:'Sintesi: quale algoritmo, e quanto è interpretabile',
+ body:`<div class="tw"><table class="t"><thead><tr><th>Algoritmo</th><th>Apprendimento</th><th>Problema</th><th>Facile da interpretare?</th></tr></thead><tbody>
+ <tr><td>Regressione lineare</td><td>Supervisionato</td><td>Regressione: valore continuo</td><td>Sì</td></tr>
+ <tr><td>Regressione logistica</td><td>Supervisionato</td><td>Classificazione binaria: probabilità</td><td>Sì</td></tr>
+ <tr><td>SVM</td><td>Supervisionato</td><td>Classificazione</td><td>—</td></tr>
+ <tr><td>Albero decisionale</td><td>Supervisionato</td><td>Classificazione e regressione</td><td>Sì</td></tr>
+ <tr><td>Random Forest</td><td>Supervisionato</td><td>Classificazione e regressione</td><td>Più difficile</td></tr>
+ <tr><td>K-means</td><td>Non supervisionato</td><td>Clustering</td><td>—</td></tr>
+ <tr><td>Reti neurali profonde</td><td>Vari</td><td>Immagini, linguaggio, altro</td><td>No: black box</td></tr></tbody></table></div>
+ <p class="small">— = il corso non si esprime su questo punto.</p>`,
+ say:`<p>Questa tabella riassume la sezione e anticipa un tema che tornerà nella parte etica: più un modello è potente, più diventa difficile spiegarlo. Regressioni e alberi decisionali si leggono con chiarezza: si vede come vengono prese le decisioni. Le Random Forest perdono un po’ di leggibilità; le reti neurali profonde, che vediamo ora, sono vere scatole nere.</p><p>Quindi la scelta dell’algoritmo non è solo una questione di accuratezza: dove serve giustificare una decisione, come in medicina o in finanza, la trasparenza pesa quanto la precisione.</p>`}
+);
+S.push(
+{sec:4,title:'Il neurone artificiale e le reti feed-forward',
+ body:`${net([3,4,2],460,200,'Rete neurale feed-forward con uno strato nascosto')}${li([
+  'Il neurone riceve input, li elabora, produce un output; ogni input ha un <b>peso</b>',
+  '<b>Funzione di attivazione</b>: un interruttore che scatta se la somma pesata supera una soglia',
+  '<b>Errore</b>: differenza tra previsione e valore atteso, ridotto con la <b>retropropagazione</b>',
+  '<b>Feed-forward</b>: i dati vanno solo dall’input all’output, senza cicli né memoria'])}`,
+ say:`<p>Le reti neurali si ispirano al cervello umano, ma i neuroni artificiali ne sono una versione matematica molto semplificata. Ogni neurone riceve più input; ciascuno ha un peso che stabilisce quanto conta. Poi entra in gioco la funzione di attivazione: se la somma pesata degli input raggiunge una certa soglia, l’interruttore scatta e il neurone produce un output significativo.</p><p>Quando la rete fa una previsione la confronta con il risultato atteso: la differenza è l’errore. Per correggerlo si usa la retropropagazione, ed è così che la rete migliora nel tempo. Le reti feed-forward sono le più semplici: l’informazione attraversa input, eventuali strati nascosti e output in un’unica direzione. Senza memoria, vanno bene quando conta solo l’input corrente, per esempio in classificazione e regressione.</p>`,
+ prec:`<p>In formula minima: uscita = f(somma di peso × input). «Addestrare» la rete significa aggiustare i pesi fino a ridurre l’errore.</p>`},
+
+{sec:4,title:'Reti profonde e deep learning',
+ body:`${net([3,5,5,5,2],460,220,'Rete neurale profonda con tre strati nascosti')}${li([
+  'Rete profonda = <b>molti più strati nascosti</b> tra input e output',
+  'La profondità permette di elaborare <b>relazioni più complesse</b> tra i dati',
+  'Rende al meglio con <b>grandi dataset</b>; addestramento oneroso, servono <b>GPU</b>',
+  '<b>Deep learning</b>: sottoinsieme del ML basato su reti profonde. Architetture: convoluzionali (immagini) e ricorrenti (sequenze)'])}`,
+ say:`<p>La differenza tra una rete semplice e una profonda sta negli strati nascosti: la profonda ne ha molti di più, ed è questa profondità che le permette di catturare relazioni complesse nei dati. Il prezzo è che ha bisogno di enormi quantità di dati e di potenza di calcolo: le GPU, ottimizzate per i calcoli in parallelo, accelerano molto l’addestramento.</p><p>Il deep learning è il ramo del machine learning che si occupa di addestrare e applicare queste reti. Le architetture più diffuse sono due: le reti convoluzionali, specializzate in immagini e dati a griglia, e le ricorrenti, specializzate in sequenze e serie temporali. Le vediamo nelle prossime due slide.</p>`},
+
+{sec:4,title:'Reti neurali convoluzionali (CNN)',
+ body:`${flow(['Immagine','Convoluzione<br><small>filtro che scorre</small>','Mappa delle caratteristiche','Pooling','Strati densi','Classe'])}${mp()}${li([
+  'Ispirate alla <b>corteccia visiva</b>: elaborano caratteristiche locali e le combinano',
+  'Strati iniziali: linee e contorni. Poi forme. Infine oggetti',
+  'Il <b>pooling</b> riduce le dimensioni tenendo l’informazione rilevante (max pooling: il valore più alto di un’area)'])}`,
+ say:`<p>Le convoluzionali sono i modelli specializzati nell’analisi delle immagini. Prendono spunto dalla corteccia visiva: nel cervello certi neuroni rispondono solo a una parte del campo visivo, e la loro combinazione dà l’immagine completa. Nella rete, un filtro, detto kernel, scorre sull’immagine esaminando una piccola sezione alla volta ed estrae una caratteristica, producendo una mappa delle caratteristiche.</p><p>Segue il pooling, che riduce la mappa senza perdere le informazioni essenziali: nel max pooling, come nel riquadro, di ogni piccola area si tiene il valore più alto. Strato dopo strato, la rete passa da linee e contorni a forme e infine a oggetti; alla fine strati densamente connessi, come in una rete tradizionale, producono il riconoscimento. In sintesi: scompone l’immagine in pezzetti e li ricompone, come il nostro cervello.</p>`,
+ lab:`<p>Riconoscimento automatico in immagini di microscopia o nei controlli visivi di qualità.</p>`},
+
+{sec:4,title:'Reti neurali ricorrenti (RNN)',
+ body:`${svgRnn}${li([
+  'Come le reti semplici, ma con <b>connessioni ricorrenti</b> che tornano indietro',
+  'Uno <b>stato interno</b> fa da memoria: ricordano gli input passati',
+  'Adatte a <b>sequenze</b> e serie temporali',
+  'Usi: analisi del sentimento in un testo, musica (comprendere e prevedere note e accordi, suggerire canzoni)'])}`,
+ say:`<p>Le reti ricorrenti si possono paragonare a macchine del tempo: a differenza delle reti tradizionali, ricordano informazioni passate e le usano nel contesto attuale, grazie alle connessioni che fanno «girare» l’informazione dentro la rete.</p><p>Esempio classico: l’analisi del sentimento. In una recensione che dice «non è stato affatto male», la parola «non» cambia il significato di quelle successive; la rete, ricordando l’ordine delle parole, coglie la sfumatura e riconosce il tono positivo. In musica vale lo stesso principio: ogni nota o accordo ha significato in base a ciò che l’ha preceduto e a ciò che seguirà, per questo le ricorrenti sono adatte anche a prevedere sequenze e a proporre canzoni in linea con i gusti passati dell’utente.</p>`,
+ prec:`<p>Per il linguaggio oggi si usano soprattutto i Transformer (citati nella slide sull’NLP). Le RNN restano utili per capire il concetto chiave: in una sequenza conta l’ordine, quindi serve memoria.</p>`,
+ lab:`<p>Serie temporali di sensori o strumenti: in questi dati l’ordine delle misure conta.</p>`},
+
+{sec:5,title:'Robotica e intelligenza artificiale',
+ body:`<p class="lead">Due campi connessi ma distinti: un robot non è necessariamente intelligente.</p>
+ <div class="cols2">${box('Robot industriali tradizionali','Anni 70 e 80. Compiti definiti e ripetitivi. Sensori, ma nessuna capacità di apprendere o adattarsi.')}${box('Cobot (robot collaborativi)','Fine anni 90, diffusi negli anni 2000. Sensori avanzati e algoritmi di apprendimento, lavorano in sicurezza a contatto con le persone.')}${box('Robot di nuova generazione','Anni 2010 e 2020. IA avanzata, sensori sofisticati, più potenza: logistica, sanità, assistenza clienti.')}${box('Robot umanoidi','Imitano aspetto e comportamento umano. Esempio: Pepper di SoftBank, riconosce espressioni facciali e vocali (fiere, eventi, ospedali).')}</div>
+ <p class="small">IA usata: <b>deep reinforcement learning</b> = reti profonde + apprendimento per rinforzo.</p>`,
+ say:`<p>La robotica studia e realizza macchine capaci di svolgere attività in modo automatico, da compiti ripetitivi a compiti complessi. L’IA riguarda algoritmi e software che permettono di svolgere attività che richiederebbero intelligenza umana. Un robot di per sé non è intelligente; lo diventa quando viene dotato di sistemi di IA.</p><p>Il corso ricostruisce l’evoluzione: dai robot industriali degli anni 70 e 80, ai cobot progettati per lavorare a stretto contatto con le persone, ai robot di nuova generazione, fino agli umanoidi, con Pepper come esempio. Quale IA usano? Una versione dell’apprendimento per rinforzo, il deep reinforcement learning: invece di programmare ogni scenario, il robot impara dall’ambiente e si adatta a situazioni impreviste.</p><p>Il film «Io, Robot» (2004, ambientato nel 2035) immagina robot che si ribellano per proteggere gli umani da sé stessi. La conclusione del corso: oggi l’IA permette ai robot di migliorare, ma non di imparare da zero compiti completamente nuovi senza intervento umano.</p>`,
+ prec:`<p>Il deep reinforcement learning è la tecnica che il corso associa alla robotica che impara dall’ambiente; non è l’unico approccio usato nei robot.</p>`,
+ lab:`<p>I cobot sono la forma più vicina al laboratorio: automatizzano operazioni ripetitive (per esempio la preparazione di campioni) lavorando accanto alle persone.</p>`},
+
+{sec:5,title:'Computer vision',
+ body:`<p class="lead">Permettere alle macchine di vedere e interpretare il mondo come fanno gli esseri umani.</p>
+ ${tl([['Anni 60–70','Riconoscimento di forme semplici, analisi di immagini satellitari, trasformata di Hough per strutture geometriche'],['Anni 60–70','Riconoscimento ottico dei caratteri (OCR): leggere e digitalizzare il testo scritto'],['2007','<b>ImageNet</b>: oltre 14 milioni di immagini annotate, più di 20.000 categorie, con competizioni annuali'],['2012','<b>AlexNet</b>: la svolta con le reti convoluzionali']])}
+ <div class="cols2">${box('Riconoscimento facciale','Lo smartphone registra il tuo volto in configurazione e poi confronta i tratti con quelli memorizzati.')}${box('Guida autonoma','Riconosce in tempo reale oggetti, ostacoli, veicoli, pedoni, corsie; monitora anche l’attenzione del conducente.')}</div>`,
+ say:`<p>Negli anni 60 e 70 la computer vision era agli albori e riconosceva forme semplici; nacquero però algoritmi come la trasformata di Hough, per individuare strutture geometriche come edifici, strade e veicoli in immagini satellitari, e le prime conferenze e database. L’OCR diede alle macchine la capacità di leggere testo scritto e trasformarlo in digitale, con effetti su editoria e archiviazione.</p><p>Il punto di svolta è ImageNet, nel 2007: un archivio di oltre 14 milioni di immagini in più di 20.000 categorie, che promosse competizioni annuali fra ricercatori. In quel contesto, nel 2012, AlexNet, una rete convoluzionale, segnò la svolta storica. Da allora il modello alla base è il deep learning con reti convoluzionali: convoluzione, pooling e strati completamente connessi che classificano l’oggetto.</p><p>Due applicazioni concrete: lo sblocco dello smartphone con il volto, e la guida autonoma, dove il riconoscimento in tempo reale è cruciale per decisioni di guida sicure.</p>`,
+ lab:`<p>Controllo qualità automatico su immagini, conteggio di colonie o cellule, lettura di etichette e codici: sono applicazioni dello stesso principio.</p>`},
+
+{sec:5,title:'Elaborazione del linguaggio naturale (NLP)',
+ body:`<p class="lead">Consente ai computer di comprendere, generare e manipolare il linguaggio umano.</p>${li([
+  'Punto d’incontro tra <b>IA, informatica e linguistica</b>',
+  'Già in uso: assistenti virtuali (Siri, Cortana, Alexa), risposte suggerite nelle email',
+  'Storia: anni 50, primi esperimenti di traduzione automatica (russo-inglese, finanziati dal governo USA); svolta dal 2010 con il machine learning',
+  'Modelli: deep learning, reti ricorrenti e <b>Transformer</b>',
+  'Applicazioni: <b>chatbot</b>, <b>moderazione dei contenuti</b> (tono e intento), <b>traduzione automatica</b>'])}`,
+ say:`<p>Molte persone usano l’NLP senza rendersene conto: è la tecnologia dietro Siri, Cortana e Alexa e dietro i suggerimenti di risposta nelle email. Analizza sia il testo scritto sia il parlato e può adattarsi a tutte le lingue umane.</p><p>La ricerca è iniziata negli anni 50 con i primi computer, ma la vera svolta è dal 2010 in poi, guidata dal machine learning. Le reti ricorrenti e i Transformer hanno permesso ai computer di leggere, ascoltare e interpretare il linguaggio in modi impensabili prima.</p><p>Applicazioni: i chatbot, che interpretano e rispondono al linguaggio umano e liberano il personale per compiti più complessi; la moderazione dei contenuti, che non guarda solo le parole ma anche tono e intento; la traduzione automatica, basata sui Transformer, come nelle applicazioni tipo ChatGPT. Ai modelli generativi è dedicata la sezione successiva.</p>`,
+ prec:`<p>I Transformer sono un’architettura del 2017 che è la base dei modelli linguistici attuali (la «T» di GPT sta proprio per Transformer).</p>`},
+
+{sec:6,title:'IA generativa: cos’è',
+ body:`<p class="lead">Tecnologie che, addestrate su vasti dataset, generano <b>nuovo contenuto</b>.</p>${li([
+  'Forme: testo, immagini, video, musica, codice',
+  'Assimilano pattern e struttura dei dati e producono contenuti simili agli originali ma con una certa novità',
+  'Modelli di deep learning: <b>Transformer</b> e <b>GAN</b>',
+  '<b>NLP</b> comprende ed elabora il linguaggio; l’<b>IA generativa</b> va oltre e crea contenuto nuovo',
+  'Rivoluzione perché <b>non serve essere informatici</b>: è alla portata di chiunque'])}`,
+ say:`<p>L’IA generativa usa modelli addestrati su grandi quantità di dati per creare contenuti nuovi in molte forme. La differenza con l’NLP è netta: l’NLP si concentra sulla comprensione e sull’elaborazione del linguaggio; l’IA generativa fa un passo in più e crea.</p><p>Perché la si chiama rivoluzione? Per l’impatto su molti settori, ma soprattutto perché è facile da usare: chiunque può generare contenuti e attività che prima richiedevano competenze da esperti. Questa versatilità è alla base della sua rapidissima diffusione nell’economia.</p>`},
+
+{sec:6,title:'Perché è una rivoluzione: settori e numeri',
+ body:`<div class="tw"><table class="t"><thead><tr><th>Dato citato nel corso</th><th>Fonte indicata</th></tr></thead><tbody>
+ <tr><td>+7% del PIL mondiale (quasi 7.000 miliardi di dollari) e +1,5 punti percentuali di produttività nel prossimo decennio</td><td>Goldman Sachs</td></tr>
+ <tr><td>L’80% dei lavori attuali può beneficiare dell’IA generativa in efficienza, produttività e creatività</td><td>Rapporto di OpenAI</td></tr>
+ <tr><td>Fino al 50% di tempo risparmiato nella scrittura di codice</td><td>Strumenti come Copilot e CodeWhisperer</td></tr></tbody></table></div>
+ ${li(['<b>Programmazione, marketing, arte, medicina</b> sono già coinvolti','<b>DeepMind</b> (acquisita da Google nel 2014) usa l’IA generativa per accelerare la ricerca di trattamenti per malattie finora considerate incurabili','Il rovescio della medaglia: possibile <b>eccesso di forza lavoro</b> in alcuni settori'])}`,
+ say:`<p>Il corso porta tre numeri per misurare l’impatto. Secondo Goldman Sachs l’IA generativa potrebbe far crescere il PIL mondiale del 7%, quasi 7.000 miliardi di dollari, e la produttività di 1,5 punti percentuali nel prossimo decennio. Un rapporto di OpenAI indica che l’80% dei lavori attuali può trarre beneficio dall’IA generativa. E per i programmatori, strumenti come Copilot e CodeWhisperer promettono fino al 50% di tempo risparmiato.</p><p>In medicina, l’esempio è DeepMind, società britannica acquisita da Google nel 2014, che usa l’IA generativa per accelerare la ricerca di cure per malattie finora incurabili. Ma c’è anche il lato preoccupante: se la tecnologia semplifica molto il lavoro in certi settori, può generare un eccesso di forza lavoro.</p>`,
+ prec:`<p>Sono stime, non fatti: la cifra di Goldman Sachs è una previsione a dieci anni. Sull’80%, lo studio associato a OpenAI (2023) parla di lavoratori con <i>almeno il 10% delle mansioni</i> influenzate dai modelli linguistici, non dell’80% dei lavori automatizzati. Copilot è lo strumento di GitHub, che si appoggia a modelli di OpenAI.</p>`},
+
+{sec:6,title:'Le categorie di strumenti generativi',
+ body:`<div class="cols2">${box('Testo e contenuti','ChatGPT e Bard: applicazioni per generare contenuti.')}${box('Immagini','Modelli specializzati come DALL·E e Midjourney.')}${box('Video sintetici','Piattaforme come Sintesia: il video del corso è stato prodotto con essa.')}${box('Deepfake','Strumenti come DeepFaceLab: video molto realistici ma manipolati di persone reali.')}</div>
+ <p class="small">Tra i sistemi che generano video ci sono quindi usi neutri (contenuti sintetici) e usi controversi (deepfake).</p>`,
+ say:`<p>Il corso raggruppa gli strumenti in quattro famiglie. Le applicazioni per generare contenuti, come ChatGPT e Bard. I modelli specializzati in immagini, come DALL·E e Midjourney. Le piattaforme per video sintetici, come Sintesia. E, sul versante controverso, i deepfake, per cui esistono strumenti come DeepFaceLab che producono video realistici ma manipolati.</p><p>Nel corso originale seguono tre approfondimenti su ChatGPT, Sintesia e deepfake. Qui ci concentriamo sul deepfake, di cui è disponibile la spiegazione tecnica, e sulla logica che lo rende possibile: le GAN.</p>`,
+ prec:`<p>Il mercato dei generatori cambia molto in fretta: Bard, per esempio, oggi si chiama Gemini. Nella trascrizione non ci sono le parti pratiche su ChatGPT e Sintesia, quindi questa slide riporta solo le categorie.</p>`},
+
+{sec:6,title:'GAN: due reti in competizione',
+ body:`${svgGan}${li([
+  '<b>Generative adversarial network</b>: due reti profonde in competizione',
+  '<b>Generatore</b>: produce dati falsi (fake) a partire da un vettore casuale',
+  '<b>Discriminatore</b>: valuta se un campione è reale (dal dataset) o falso',
+  'Il feedback arriva a entrambi; chi perde aggiusta il proprio modello. Il ciclo si ripete finché il discriminatore non distingue più'])}`,
+ say:`<p>Le GAN funzionano con una competizione. Un generatore cerca di produrre dati sempre più convincenti; un discriminatore cerca di diventare sempre più abile a riconoscere i falsi. Il processo raffina il generatore fino a un punto in cui il discriminatore non riesce più a distinguere il reale dal falso.</p><p>Esempio del corso, i gatti finti. Primo passo: si addestra il discriminatore a riconoscere un vero gatto (pelo, orecchie appuntite) mostrandogli molte foto di gatti e anche immagini che non lo sono, come fiori. Secondo passo: il generatore parte da un vettore casuale e crea un gatto finto. Il discriminatore lo valuta e spiega perché lo ha riconosciuto come falso. Uno dei due vince e mantiene il modello, l’altro lo modifica. Ripetendo questi cicli, il generatore produce gatti sempre più realistici.</p>`,
+ prec:`<p>Le GAN sono state introdotte da Ian Goodfellow e colleghi nel 2014. Oggi molti generatori di immagini recenti si basano più su modelli di diffusione che su GAN; il corso le presenta perché sono alla base dei deepfake.</p>`},
+
+{sec:6,title:'Deepfake e DeepFaceLab',
+ body:`<p class="lead">Un video manipolato in cui il volto di una persona viene sostituito con quello di un’altra tramite deep learning.</p>${li([
+  'Usi: <b>intrattenimento</b>, ma anche <b>disinformazione</b> e contenuti nocivi',
+  '<b>Dovere etico</b> di ciascuno: usare la tecnologia in modo appropriato',
+  '<b>DeepFaceLab</b>: software open source, di un team di sviluppatori russi, lanciato nell’aprile 2019; scopo principale: il <b>face swapping</b>',
+  'Qualità dei risultati: dipende da quantità e qualità dei dati del dataset',
+  'Addestramento: da ore a settimane; serve una <b>GPU</b> potente'])}`,
+ say:`<p>I deepfake sono uno strumento di IA che solleva questioni etiche importanti: si possono usare per intrattenere, ma anche per diffondere disinformazione o produrre contenuti dannosi. Il corso lo dice con chiarezza: usare la tecnologia in modo appropriato è un dovere etico di ciascuno.</p><p>DeepFaceLab è il software open source più popolare per creare deepfake. Si basa sul modello GAN visto prima: da un lato c’è il volto di una persona famosa, dal quale si ottiene un dataset di immagini; dall’altro c’è una persona comune o un attore che pronuncia un discorso, con il suo dataset. Il risultato dipende da quantità e qualità dei dati, e l’addestramento può richiedere da ore a settimane, con una scheda grafica potente.</p><p>Il punto da sottolineare in aula: la barriera tecnica è bassa, perché bastano video già presenti sul web con un volto nitido. Ecco perché il tema etico è centrale.</p>`,
+ prec:`<p>Il corso parla di GAN; a rigore DeepFaceLab usa soprattutto autoencoder, con una componente GAN opzionale. Il concetto (due reti che si affinano a vicenda) resta valido. Il Regolamento UE sull’IA (AI Act) prevede obblighi di trasparenza per i contenuti generati o manipolati dall’IA, deepfake compresi.</p>`},
+
+{sec:7,title:'Tre aree di preoccupazione',
+ body:`<p class="lead">L’IA può migliorare la vita in molti modi, ma un uso non corretto solleva tre grandi questioni.</p>
+ <div class="cols3">${box('Uso improprio ed etica','Deepfake e video falsi per la disinformazione: l’uso inappropriato rientra nell’etica dell’IA.')}${box('Occupazione','La rapida diffusione può ridurre i posti di lavoro in alcune professioni.')}${box('Privacy e governance dei dati','I modelli si basano su enormi quantità di dati: come si raccolgono e si gestiscono?')}</div>`,
+ say:`<p>L’ultima sezione affronta i temi caldi. Da un lato ci sono grandi aspettative: l’IA ha già dimostrato di poter rivoluzionare la ricerca scientifica, come nel caso di DeepMind. Dall’altro, tre aree di dibattito. Primo, l’uso improprio: i deepfake mostrano come si possano creare video falsi. Secondo, l’occupazione: la produttività aumenta ma cresce il timore di perdere posti di lavoro. Terzo, la privacy: i modelli si nutrono di enormi quantità di dati, e la governance di quei dati, cioè come sono raccolti e gestiti, solleva problemi di sicurezza e riservatezza.</p><p>Le prossime slide analizzano nel dettaglio bias, spiegabilità, impatto economico e privacy.</p>`},
+
+{sec:7,title:'Bias: i pregiudizi nei dati',
+ body:`${flow(['Dati con pregiudizi','Modello addestrato','Decisioni distorte o inique'])}${li([
+  '<b>Bias</b> = pregiudizio o distorsione presente nei dati o negli algoritmi',
+  'Se i dati di addestramento contengono pregiudizi, il modello li <b>assimila</b> e produce previsioni con bias',
+  'Origini culturali, sociali o ideologiche',
+  'Esempi: sistemi di raccomandazione per le <b>assunzioni</b> che favoriscono certi candidati; <b>prestiti</b> approvati o rifiutati in modo discriminatorio'])}`,
+ say:`<p>Abbiamo visto che nel machine learning previsioni e risultati dipendono in modo significativo dai dati. Se i dati di partenza sono imprecisi o errati, i risultati ne risentono. Da qui il concetto di bias, cioè di pregiudizio o distorsione.</p><p>Quando i dati contengono pregiudizi preesistenti, il modello li assimila e li riproduce. Le origini sono in genere culturali, sociali o ideologiche, e le conseguenze possono essere decisioni discriminatorie: nella selezione del personale, dove un modello può favorire alcuni candidati a discapito di altri; nel settore finanziario, dove può influenzare l’approvazione o il rifiuto dei prestiti sulla base di criteri distorti.</p>`,
+ lab:`<p>Un modello addestrato solo su campioni di un certo tipo funziona male sugli altri: il bias non è solo un tema etico, è anche un problema di metodo.</p>`},
+
+{sec:7,title:'Trasparenza e spiegabilità',
+ body:`<div class="cols2">${box('Trasparenza','Capire <b>come</b> il modello prende le decisioni: fiducia nella tecnologia e attribuzione delle responsabilità in caso di errore.')}${box('Spiegabilità','Saper spiegare le decisioni in termini comprensibili: aiuta a trovare difetti nei dati o negli algoritmi e a correggerli.')}</div>
+ <div class="scale"><div class="g"></div><div class="m"><span>Facili da interpretare: regressioni, alberi decisionali</span><span>Random Forest</span><span>Black box: reti profonde, milioni di parametri</span></div></div>
+ ${li(['Esempio: una diagnosi medica sbagliata da un modello di ML. Il medico deve poter capire come si è arrivati a quella decisione'])}`,
+ say:`<p>Due concetti collegati. La trasparenza riguarda la comprensione di come il modello decide: serve a fidarsi della tecnologia e a stabilire di chi è la responsabilità quando qualcosa va storto. La spiegabilità è la capacità del modello di motivare le sue decisioni in modo comprensibile per una persona.</p><p>Pensiamo a un sistema di diagnosi medica che sbaglia. La trasparenza permette al medico di ricostruire come è arrivato alla decisione, la spiegabilità aiuta a individuare difetti nei dati o negli algoritmi e a correggerli.</p><p>Quanto è difficile spiegare un modello? Dipende dal tipo. Regressione lineare e logistica e alberi decisionali sono facilmente interpretabili. Le reti neurali profonde, invece, con milioni di parametri, sono le famose black box. Man mano che i modelli si sofisticano, la spiegabilità diventa un problema sempre più serio.</p>`},
+
+{sec:7,title:'Impatto economico e occupazionale',
+ body:`${li([
+  'Goldman Sachs: <b>+7% del PIL mondiale</b> e <b>+1,5 punti di produttività</b> in 10 anni',
+  'Ma la tecnologia semplifica il lavoro in alcuni settori e può creare un <b>eccesso di forza lavoro</b>',
+  'L’IA non è nuova nell’economia: già dagli anni 90 con i <b>cobot</b> nel manifatturiero',
+  'Dal 2020 l’<b>IA generativa</b> è una nuova era: genera contenuti, traduce, e può essere addestrata con i propri dati come un assistente',
+  'Preoccupazione soprattutto per i <b>colletti bianchi</b>',
+  'Risposta razionale: <b>imparare a coesistere</b> con l’IA e prepararsi a trarne vantaggio'])}`,
+ say:`<p>L’impatto economico ha luci e ombre. Da un lato la crescita stimata del PIL e della produttività; dall’altro il timore per i posti di lavoro, perché la tecnologia semplifica molto il lavoro in alcuni settori.</p><p>Il corso fa notare che la storia non è così recente: già negli anni 90 i cobot, con sensori e algoritmi di apprendimento, lavoravano accanto alle persone nel manifatturiero. Ma con l’IA generativa, dagli inizi del 2020, siamo in una nuova era: può produrre testi, libri, immagini, musica, tradurre in modo sempre più accurato e persino essere addestrata con i propri dati e la propria filosofia aziendale, come un dipendente dell’azienda, a costi molto inferiori.</p><p>Questo preoccupa soprattutto i colletti bianchi, professioni fin qui stabili. Poiché siamo probabilmente all’inizio di un’evoluzione che non si può fermare, la soluzione razionale, dice il corso, è imparare a coesistere con l’IA anziché averne solo timore.</p>`},
+
+{sec:7,title:'Il caso Hollywood',
+ body:`<p class="lead">Lo sciopero dei lavoratori di Hollywood: l’IA può sostituire il lavoro umano anche dove non ce lo si aspetta.</p>
+ <div class="cols3">${box('Sceneggiatori','L’IA generativa può creare storie, libri e sceneggiature.')}${box('Doppiatori','La clonazione delle voci e il text-to-speech possono doppiare i film, mettendo a rischio l’impiego.')}${box('Attori','Soprattutto i ruoli minori temono di essere clonati: immagine scansionata e riutilizzata senza nuove performance.')}</div>`,
+ say:`<p>Un esempio emblematico dell’impatto sul lavoro è lo sciopero di Hollywood. Tre le preoccupazioni. Gli sceneggiatori, per la capacità dell’IA di creare storie, libri e persino sceneggiature. I doppiatori, per la possibilità di clonare le voci umane e doppiare i film con la tecnologia text-to-speech. Gli attori, in particolare quelli dei ruoli minori, che temono che la loro immagine venga scansionata e riutilizzata in molti contenuti futuri senza bisogno di richiamarli.</p><p>Il caso mostra che nemmeno un settore tradizionalmente umano come il cinema è al riparo, e che le questioni di lavoro si intrecciano con quelle etiche dei deepfake: l’uso dell’immagine e della voce di una persona.</p>`},
+
+{sec:7,title:'Privacy e governance dei dati',
+ body:`${li([
+  'I <b>chatbot</b> simulano conversazioni umane e apprendono dalle interazioni con le persone',
+  'Possono estrarre informazioni da milioni di siti web (attività regolata da copyright e privacy)',
+  'Possono raccogliere <b>dati personali</b>: nomi, indirizzi, email, informazioni sensibili',
+  'I modelli complessi sono black box: possono trovare schemi che rivelano informazioni private, e gli utenti non sanno come vengono usati i dati',
+  'Le fonti non sono sempre verificate: rischio di <b>disinformazione</b> e di bias',
+  '<b>Governance dell’IA</b>: regole e principi per un uso etico e sicuro'])}`,
+ say:`<p>Una delle principali preoccupazioni è la tutela della privacy, legata soprattutto alla diffusione dei chatbot. Sono programmi che simulano conversazioni umane e rispondono alle domande; imparano dalle interazioni e possono ricavare informazioni da milioni di siti, pratica che dovrebbe rispettare copyright e privacy.</p><p>Il problema è che durante le conversazioni possono raccogliere dati personali. E poiché gli algoritmi più complessi sono scatole nere, possono individuare schemi non evidenti agli esseri umani e rivelare informazioni che una persona preferirebbe riservate, senza che l’utente sappia come vengono usati e interpretati i suoi dati. In più, i chatbot spesso non verificano la qualità delle fonti: possono propagare disinformazione e alimentare il bias.</p><p>Tutte queste preoccupazioni ruotano attorno alla governance dell’IA: l’insieme di regole e principi che mirano a un uso etico e sicuro.</p>`,
+ prec:`<p>In pratica un modello non si aggiorna in tempo reale a ogni conversazione, ma ciò che si scrive in un chatbot può essere conservato e, secondo le impostazioni del servizio, usato per addestramento. Nel marzo 2023 il Garante italiano per la protezione dei dati personali ha limitato temporaneamente ChatGPT proprio per questioni di privacy.</p>`,
+ lab:`<p>Non incollare in un chatbot dati di clienti, campioni riservati o documenti aziendali senza sapere dove finiscono.</p>`},
+
+{sec:7,title:'Conclusioni',
+ body:`<p class="lead">L’IA fa già parte del nostro presente e del nostro futuro.</p>${li([
+  'L’IA imita il comportamento umano; oggi quella in uso è specializzata',
+  'Il machine learning impara dai dati: <b>qualità dei dati = qualità del modello</b>',
+  'Quattro modi di imparare: supervisionato, non supervisionato, semi-supervisionato, per rinforzo',
+  'Reti profonde e deep learning sono potenti ma <b>opachi</b>',
+  'L’IA generativa è un’opportunità e un rischio: deepfake, lavoro, privacy',
+  'Con un’<b>adeguata regolamentazione</b>, l’IA può migliorare molti aspetti della vita, in forme che oggi non è facile intravedere'])}`,
+ say:`<p>Il corso si chiude con un’idea semplice: l’IA non è un’ipotesi futura, ma fa già parte del presente. Il messaggio che si può portare in aula è in tre passaggi. Capire come funziona, dalla differenza tra i tipi di apprendimento fino alle reti profonde. Riconoscerne i limiti: dati distorti, opacità, uso improprio. Usarla in modo consapevole, con regole adeguate.</p><p>Con una regolamentazione adeguata, dice il corso, l’intelligenza artificiale ha il potenziale di migliorare la vita delle persone in modi che oggi ancora non riusciamo a vedere.</p>`},
+
+{sec:8,title:'Dopo il corso: cosa è cambiato',
+ body:`<p class="tag" style="margin:0 0 10px">Integrazione: non presente nel corso</p>${li([
+  '<b>Bard</b> è diventato <b>Gemini</b> (2024)',
+  'Dopo GPT-3 sono arrivati modelli più grandi e <b>multimodali</b>, che trattano insieme testo, immagini e audio',
+  'I <b>Transformer</b> dominano il linguaggio; molti generatori di immagini usano modelli di <b>diffusione</b>',
+  'L’UE ha adottato il <b>Regolamento sull’IA (AI Act, 2024/1689)</b>: approccio per livelli di rischio, obblighi di trasparenza, applicazione graduale',
+  'Le cifre economiche citate (Goldman Sachs, 2023) restano <b>stime</b>, non risultati misurati'])}`,
+ say:`<p>Il corso risale a qualche anno fa e il settore si muove in fretta. Ho raccolto qui i punti su cui conviene aggiornarsi, così puoi rispondere alle domande di chi ha in mente strumenti più recenti di quelli citati.</p><p>Il nucleo concettuale resta valido: dati, algoritmi, reti neurali, bias, spiegabilità. Cambiano i nomi dei prodotti e cresce il quadro normativo europeo, che riprende proprio i temi del corso: rischio, trasparenza, uso dei dati.</p>`},
+
+{sec:8,title:'Glossario essenziale',
+ body:`<dl class="gl">
+ <div><dt>Algoritmo</dt><dd>sequenza di istruzioni, una «ricetta»</dd></div>
+ <div><dt>Dataset</dt><dd>insieme strutturato di dati per addestrare il modello</dd></div>
+ <div><dt>Etichetta</dt><dd>risposta corretta associata a un dato</dd></div>
+ <div><dt>Training e testing</dt><dd>addestramento e verifica su dati nuovi</dd></div>
+ <div><dt>Pattern</dt><dd>insieme di caratteristiche distintive nei dati</dd></div>
+ <div><dt>Cluster e centroide</dt><dd>gruppo di dati simili e suo punto medio</dd></div>
+ <div><dt>Iperpiano</dt><dd>generalizzazione di retta e piano a più variabili</dd></div>
+ <div><dt>Vettori di supporto</dt><dd>punti più vicini al confine tra le classi</dd></div>
+ <div><dt>Peso</dt><dd>importanza di un input per un neurone</dd></div>
+ <div><dt>Funzione di attivazione</dt><dd>interruttore a soglia del neurone</dd></div>
+ <div><dt>Retropropagazione</dt><dd>tecnica per ridurre l’errore della rete</dd></div>
+ <div><dt>Strato nascosto</dt><dd>strato intermedio fra input e output</dd></div>
+ <div><dt>Convoluzione e pooling</dt><dd>estrazione di caratteristiche e riduzione della mappa</dd></div>
+ <div><dt>GPU</dt><dd>scheda ottimizzata per calcoli in parallelo</dd></div>
+ <div><dt>Transformer</dt><dd>architettura di rete per il linguaggio</dd></div>
+ <div><dt>GAN</dt><dd>due reti, generatore e discriminatore, in competizione</dd></div>
+ <div><dt>Deepfake</dt><dd>video manipolato con sostituzione del volto</dd></div>
+ <div><dt>Bias</dt><dd>pregiudizio nei dati o negli algoritmi</dd></div>
+ <div><dt>Black box</dt><dd>modello di cui è difficile interpretare le decisioni</dd></div>
+ <div><dt>Governance dell’IA</dt><dd>regole e principi per un uso etico e sicuro</dd></div>
+ </dl>`,
+ say:`<p>Un promemoria dei termini che ricorrono nel corso, utile da tenere sotto mano durante una lezione. Se qualcuno ti chiede «che cos’è un pattern?» o «che cosa sono i vettori di supporto?», la risposta breve è qui; quella estesa è nella slide corrispondente.</p>`}
+);
+
+/* ---------- motore ---------- */
+const app=document.getElementById('app'),strip=document.getElementById('strip'),idx=document.getElementById('idx'),cnt=document.getElementById('cnt'),tg=document.getElementById('tg');
+SEC.slice(1,8).forEach((s,k)=>{
+  const b=document.createElement('button');b.className='seg';b.type='button';b.style.setProperty('--c',s.c);
+  b.innerHTML=`<i></i><span>${s.n}</span>`;b.title=s.n;b.setAttribute('aria-label','Vai a '+s.n);
+  b.addEventListener('click',()=>go(S.findIndex(x=>x.sec===k+1)));strip.appendChild(b);
+});
+const segs=[...strip.children];
+const groups={};
+S.forEach((s,i)=>{
+  const sec=SEC[s.sec];
+  const el=document.createElement('section');el.className='slide'+(s.cls?' '+s.cls:'');el.id='s'+(i+1);
+  el.style.setProperty('--sc',sec.c);el.setAttribute('aria-label','Slide '+(i+1)+': '+s.title);
+  let sc='';
+  if(s.say)sc+=`<section><h3>Informazioni</h3>${s.say}</section>`;
+  if(s.prec)sc+=`<section class="prec"><h3>Precisazione </h3>${s.prec}</section>`;
+  if(s.lab)sc+=`<section class="lab"><h3>Esempio per il laboratorio </h3>${s.lab}</section>`;
+  el.innerHTML=`<div class="stage"><article class="card"><h2>${s.title}</h2><div class="body">${s.body}</div><footer><span>${sec.n}</span><span>${i+1} / ${S.length}</span></footer></article></div><aside class="script" aria-label="Testo per argomentare">${sc}</aside>`;
+  app.appendChild(el);
+  (groups[sec.n]=groups[sec.n]||[]).push([i,s.title]);
+});
+Object.keys(groups).forEach(n=>{
+  const og=document.createElement('optgroup');og.label=n;
+  groups[n].forEach(([i,t])=>{const o=document.createElement('option');o.value=i;o.textContent=(i+1)+'. '+t;og.appendChild(o);});
+  idx.appendChild(og);
+});
+const els=[...app.children];let cur=0;
+function go(i,noScroll){
+  i=Math.max(0,Math.min(S.length-1,i));
+  els[cur].classList.remove('on');cur=i;els[cur].classList.add('on');
+  const sec=S[cur].sec;
+  segs.forEach((b,k)=>b.setAttribute('aria-current',String(k+1===sec)));
+  idx.value=cur;cnt.textContent=(cur+1)+' / '+S.length;
+  try{history.replaceState(null,'','#'+(cur+1));}catch(e){}
+  if(!noScroll)window.scrollTo(0,0);
+}
+document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+document.getElementById('next').addEventListener('click',()=>go(cur+1));
+idx.addEventListener('change',()=>go(+idx.value));
+function toggle(){const on=document.body.classList.toggle('solo');tg.textContent=on?'Mostra copione':'Nascondi copione';}
+tg.addEventListener('click',toggle);
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT'||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);
+  else if(e.key==='s'||e.key==='S')toggle();
+});
+let start=0;try{const h=parseInt((location.hash||'').slice(1),10);if(h>=1&&h<=S.length)start=h-1;}catch(e){}
+els[0].classList.add('on');go(start,true);
+</script>
+</body>
+</html>
