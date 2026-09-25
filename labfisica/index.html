@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtuale: La Molla e il Moto Armonico Semplice</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for rendered math equations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        physics: {
+                            blue: '#3b82f6',
+                            green: '#10b981',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e',
+                            purple: '#8b5cf6',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for theoretical panel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-200 bg-slate-950 overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-600/30 text-indigo-400 rounded-lg border border-indigo-500/30">
+                    <i class="fa-solid fa-wave-square text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        Laboratorio Virtuale di Fisica
+                        <span class="text-xs bg-indigo-500/20 text-indigo-300 font-medium px-2 py-0.5 rounded-full border border-indigo-500/30">Molle & Oscillazioni</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Legge di Hooke, Moto Armonico Semplice e Smorzamento</p>
+                </div>
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs text-slate-400 font-medium mr-1 hidden sm:inline"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Preset:</span>
+                <button onclick="setPreset('ideal')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition">Ideale (No Attrito)</button>
+                <button onclick="setPreset('damped')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition">Smorzato</button>
+                <button onclick="setPreset('critical')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition">Smorzamento Critico</button>
+                <button onclick="setPreset('heavy')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition">Massa Elevata</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: CANVAS SIMULATION & CONTROLS (Lg: 7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- SIMULATION CANVAS CARD -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl shadow-lg overflow-hidden flex flex-col relative">
+                <!-- Canvas Top Overlay Controls -->
+                <div class="px-4 py-2 bg-slate-800/80 backdrop-blur border-b border-slate-700/50 flex justify-between items-center text-xs">
+                    <div class="flex items-center gap-3">
+                        <span class="font-semibold text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-gamepad text-indigo-400"></i> Vista Simulazione
+                        </span>
+                        <span id="dragHint" class="text-slate-400 hidden sm:inline bg-slate-700/50 px-2 py-0.5 rounded text-[11px]">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i> Trascina la massa per allungare
+                        </span>
+                    </div>
+                    
+                    <!-- Mode Selector (Horizontal vs Vertical) -->
+                    <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-700">
+                        <button id="btnHorizontal" onclick="setOrientation('horizontal')" class="px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-600 text-white transition">
+                            <i class="fa-solid fa-arrows-left-right mr-1"></i> Orizzontale
+                        </button>
+                        <button id="btnVertical" onclick="setOrientation('vertical')" class="px-2.5 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition">
+                            <i class="fa-solid fa-arrows-up-down mr-1"></i> Verticale
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive Main Physics Canvas -->
+                <div class="relative w-full h-[380px] bg-slate-950 flex items-center justify-center cursor-grab active:cursor-grabbing select-none" id="canvasContainer">
+                    <canvas id="simCanvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- Floating Dynamic Physics Data Badge -->
+                    <div class="absolute top-3 left-3 bg-slate-900/90 border border-slate-700 backdrop-blur-md p-2.5 rounded-lg text-xs font-mono space-y-1 shadow-md pointer-events-none">
+                        <div class="text-slate-400 font-bold border-b border-slate-700 pb-1 mb-1">Stato Istantaneo</div>
+                        <div class="flex justify-between gap-4"><span class="text-slate-400">Posizione (x):</span> <span id="valX" class="text-indigo-400 font-bold">+0.00 m</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-slate-400">Velocità (v):</span> <span id="valV" class="text-emerald-400 font-bold">0.00 m/s</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-slate-400">Accelerazione (a):</span> <span id="valA" class="text-amber-400 font-bold">0.00 m/s²</span></div>
+                        <div class="flex justify-between gap-4 border-t border-slate-800 pt-1 mt-1"><span class="text-slate-400">Forza elastica (F_el):</span> <span id="valF" class="text-rose-400 font-bold">0.00 N</span></div>
+                    </div>
+
+                    <!-- Theoretical Period Badge -->
+                    <div class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-700 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-mono shadow-md pointer-events-none">
+                        <span class="text-slate-400">Periodo Teorico (T):</span> 
+                        <span id="valPeriod" class="text-purple-400 font-bold ml-1">0.89 s</span>
+                        <span class="text-slate-500 ml-1 text-[10px]">(f = <span id="valFreq">1.12</span> Hz)</span>
+                    </div>
+                </div>
+
+                <!-- Simulation Action Control Bar -->
+                <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <!-- Playback controls -->
+                    <div class="flex items-center gap-2">
+                        <button id="btnPlay" onclick="togglePlay()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold text-sm flex items-center gap-2 shadow-md transition">
+                            <i class="fa-solid fa-pause" id="playIcon"></i> <span id="playText">Pausa</span>
+                        </button>
+                        <button onclick="stepSim()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm transition" title="Passo Singolo">
+                            <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                        <button onclick="resetSim()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm transition" title="Azzera e Riavvia">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- Vector Toggles -->
+                    <div class="flex items-center gap-3 text-xs bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-400 font-medium mr-1">Vettori:</span>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-rose-400 hover:text-rose-300">
+                            <input type="checkbox" id="chkForce" checked onchange="draw()" class="rounded bg-slate-800 border-slate-700 text-rose-500 focus:ring-0">
+                            <span>Forza ($F_{el}$)</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-emerald-400 hover:text-emerald-300">
+                            <input type="checkbox" id="chkVel" checked onchange="draw()" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0">
+                            <span>Velocità ($v$)</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-amber-400 hover:text-amber-300">
+                            <input type="checkbox" id="chkAcc" onchange="draw()" class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-0">
+                            <span>Accel. ($a$)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIME GRAPH CARD -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-indigo-400"></i> Grafici Temporali in Tempo Reale
+                    </h3>
+                    <div class="flex gap-3 text-xs font-mono">
+                        <span class="text-indigo-400 flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> x(t) Posizione</span>
+                        <span class="text-emerald-400 flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> v(t) Velocità</span>
+                        <span class="text-amber-400 flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> a(t) Accel.</span>
+                    </div>
+                </div>
+                <div class="w-full h-36 bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative">
+                    <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: PARAMETER SLIDERS & ENERGY HISTOGRAM (Lg: 5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+
+            <!-- PARAMETERS CONTROL CARD -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+                <h2 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i> Parametri Fisici
+                </h2>
+
+                <!-- Slider 1: Constant k -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <label for="sliderK" class="font-medium text-slate-300">Costante Elastica ($k$)</label>
+                        <span class="font-mono text-indigo-400 font-bold"><span id="lblK">50</span> N/m</span>
+                    </div>
+                    <input type="range" id="sliderK" min="10" max="200" step="1" value="50" oninput="updateParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>10 N/m (Molle cedevole)</span>
+                        <span>200 N/m (Molla rigida)</span>
+                    </div>
+                </div>
+
+                <!-- Slider 2: Mass m -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <label for="sliderM" class="font-medium text-slate-300">Massa ($m$)</label>
+                        <span class="font-mono text-emerald-400 font-bold"><span id="lblM">1.0</span> kg</span>
+                    </div>
+                    <input type="range" id="sliderM" min="0.1" max="5.0" step="0.1" value="1.0" oninput="updateParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>0.1 kg</span>
+                        <span>5.0 kg</span>
+                    </div>
+                </div>
+
+                <!-- Slider 3: Damping b -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <label for="sliderB" class="font-medium text-slate-300">Coeff. Smorzamento / Attrito ($b$)</label>
+                        <span class="font-mono text-amber-400 font-bold"><span id="lblB">0.20</span> Ns/m</span>
+                    </div>
+                    <input type="range" id="sliderB" min="0.0" max="4.0" step="0.05" value="0.20" oninput="updateParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>0.0 (Senza attrito)</span>
+                        <span>4.0 (Forte smorzamento)</span>
+                    </div>
+                </div>
+
+                <!-- Slider 4: Gravity Toggle / Intensity -->
+                <div class="space-y-1.5 border-t border-slate-800/80 pt-3">
+                    <div class="flex justify-between text-xs items-center">
+                        <label for="sliderG" class="font-medium text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-earth-americas text-slate-400"></i> Accel. di Gravità ($g$)
+                        </label>
+                        <span class="font-mono text-purple-400 font-bold"><span id="lblG">9.81</span> m/s²</span>
+                    </div>
+                    <input type="range" id="sliderG" min="0.0" max="25.0" step="0.1" value="9.81" oninput="updateParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>0 m/s² (Spazio)</span>
+                        <span>9.81 (Terra)</span>
+                        <span>24.8 (Giove)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENERGY HISTOGRAM CARD -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Bilancio Energetico
+                    </h2>
+                    <span class="text-xs font-mono text-slate-400">Totale: <strong id="lblETot" class="text-white">0.00 J</strong></span>
+                </div>
+
+                <!-- Energy Bars Container -->
+                <div class="space-y-3 font-mono text-xs">
+                    <!-- Elastic Potential Energy -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-indigo-300 font-medium">Potenziale Elastica ($E_p = \frac{1}{2}kx^2$)</span>
+                            <span id="lblEp" class="text-indigo-400">0.00 J</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                            <div id="barEp" class="h-full bg-indigo-500 transition-all duration-75" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Kinetic Energy -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-emerald-300 font-medium">Cinetica ($E_k = \frac{1}{2}mv^2$)</span>
+                            <span id="lblEk" class="text-emerald-400">0.00 J</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                            <div id="barEk" class="h-full bg-emerald-500 transition-all duration-75" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dissipated Thermal Energy (Damping) -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-amber-300 font-medium">Dissipata per Attrito ($E_{diss}$)</span>
+                            <span id="lblEdiss" class="text-amber-400">0.00 J</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                            <div id="barEdiss" class="h-full bg-amber-500 transition-all duration-75" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM TABS: THEORY, EXPERIMENTS & QUIZ (Lg: 12 cols) -->
+        <div class="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-xl shadow-lg overflow-hidden mt-2">
+            
+            <!-- Tab Headers -->
+            <div class="flex border-b border-slate-800 bg-slate-950/60 font-medium text-sm overflow-x-auto">
+                <button onclick="switchTab('theory')" id="tabTheoryBtn" class="px-5 py-3 text-indigo-400 border-b-2 border-indigo-500 font-semibold flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-book-open"></i> Richiami Teorici
+                </button>
+                <button onclick="switchTab('experiments')" id="tabExpBtn" class="px-5 py-3 text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-flask"></i> Scheda di Laboratorio & Esperimenti
+                </button>
+                <button onclick="switchTab('quiz')" id="tabQuizBtn" class="px-5 py-3 text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-circle-question"></i> Quiz Interattivo
+                </button>
+            </div>
+
+            <!-- TAB CONTENT 1: THEORY -->
+            <div id="tabTheory" class="p-6 text-sm text-slate-300 space-y-6 leading-relaxed">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Card 1 -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h3 class="text-indigo-400 font-bold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-magnet"></i> Legge di Hooke
+                        </h3>
+                        <p>Una molla ideale esercita una <strong>forza di richiamo</strong> direttamente proporzionale allo spostamento $x$ rispetto alla posizione di equilibrio:</p>
+                        <div class="p-2 bg-slate-900 rounded border border-slate-800 text-center font-mono text-indigo-300 my-2">
+                            $$F_{el} = -k \cdot x$$
+                        </div>
+                        <ul class="list-disc list-inside text-xs text-slate-400 space-y-1">
+                            <li>$k$: costante elastica della molla ($N/m$).</li>
+                            <li>Il segno meno ($--$) indica che la forza è sempre diretta in verso opposto allo spostamento.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h3 class="text-emerald-400 font-bold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-stopwatch"></i> Moto Armonico & Periodo
+                        </h3>
+                        <p>In assenza di attrito, l'equazione del moto $m a = -k x$ genera un'oscillazione sinusoidale pura con un <strong>periodo di oscillazione</strong> $T$ pari a:</p>
+                        <div class="p-2 bg-slate-900 rounded border border-slate-800 text-center font-mono text-emerald-300 my-2">
+                            $$T = 2\pi \sqrt{\frac{m}{k}}$$
+                        </div>
+                        <ul class="list-disc list-inside text-xs text-slate-400 space-y-1">
+                            <li>Il periodo <strong>non dipende</strong> dall'ampiezza dell'oscillazione (isocronismo).</li>
+                            <li>Aumentando la massa $m$, l'oscillazione diventa più lenta.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h3 class="text-amber-400 font-bold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i> Conservazione dell'Energia
+                        </h3>
+                        <p>In un sistema isolato non smorzato ($b = 0$), l'energia meccanica totale rimane costante tramite continua conversione tra energia cinetica e potenziale:</p>
+                        <div class="p-2 bg-slate-900 rounded border border-slate-800 text-center font-mono text-amber-300 my-2">
+                            $$E_{tot} = \frac{1}{2}m v^2 + \frac{1}{2}k x^2 = \text{costante}$$
+                        </div>
+                        <p class="text-xs text-slate-400">In presenza di attrito ($b > 0$), l'energia meccanica totale diminuisce convertendosi gradualmente in energia termica.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TAB CONTENT 2: GUIDED EXPERIMENTS -->
+            <div id="tabExperiments" class="p-6 text-sm text-slate-300 space-y-4 hidden">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-vial-circle-check text-emerald-400"></i> Esperimenti Guidati da Eseguire in Simulazione
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Esperimento 1</span>
+                        <h4 class="font-bold text-slate-200">Verifica della Dipendenza del Periodo dalla Massa</h4>
+                        <ol class="list-decimal list-inside text-xs text-slate-400 space-y-1.5">
+                            <li>Imposta lo smorzamento $b = 0.0$ Ns/m.</li>
+                            <li>Imposta $k = 100$ N/m e osserva il periodo con $m = 1.0$ kg ($T \approx 0.63$ s).</li>
+                            <li>Quadruplica la massa portandola a $m = 4.0$ kg. Osserva cosa succede al periodo $T$.</li>
+                            <li><em>Domanda di riflessione:</em> Il periodo è raddoppiato o quadruplicato? Perché?</li>
+                        </ol>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Esperimento 2</span>
+                        <h4 class="font-bold text-slate-200">Lo Smorzamento Critico negli Ammortizzatori</h4>
+                        <ol class="list-decimal list-inside text-xs text-slate-400 space-y-1.5">
+                            <li>Seleziona il preset <strong>"Smorzamento Critico"</strong> in alto a destra.</li>
+                            <li>Sposta la massa trascinandola lateralmente e rilasciala.</li>
+                            <li>Osserva come la massa ritorna alla posizione di equilibrio nel minor tempo possibile <strong>senza oscillare</strong>.</li>
+                            <li><em>Applicazione reale:</em> Gli ammortizzatori delle automobili sfruttano proprio questo principio!</li>
+                        </ol>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TAB CONTENT 3: QUIZ -->
+            <div id="tabQuiz" class="p-6 text-sm text-slate-300 space-y-4 hidden">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-indigo-400"></i> Test di Verifica delle Competenze
+                    </h3>
+                    <span id="quizScoreBadge" class="text-xs bg-slate-800 px-3 py-1 rounded-full border border-slate-700 font-mono">Punteggio: <strong id="quizScore" class="text-indigo-400">0 / 3</strong></span>
+                </div>
+
+                <div id="quizContainer" class="space-y-6">
+                    <!-- Q1 -->
+                    <div class="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-3" id="q1">
+                        <p class="font-medium text-slate-200">1. Se quadruplichi la costante elastica $k$ della molla, come varia il periodo di oscillazione $T$? </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                            <button onclick="checkQuiz(1, 'A', false)" class="q-btn-1-A text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">A) Si raddoppia ($2T$)</button>
+                            <button onclick="checkQuiz(1, 'B', true)" class="q-btn-1-B text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">B) Si dimezza ($T / 2$)</button>
+                            <button onclick="checkQuiz(1, 'C', false)" class="q-btn-1-C text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">C) Diventa un quarto ($T / 4$)</button>
+                        </div>
+                        <div id="q1-feedback" class="text-xs font-semibold hidden"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-3" id="q2">
+                        <p class="font-medium text-slate-200">2. In quale punto del moto la velocità della massa attaccata alla molla è MASSIMA?</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                            <button onclick="checkQuiz(2, 'A', false)" class="q-btn-2-A text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">A) Agli estremi di massima estensione/compressione</button>
+                            <button onclick="checkQuiz(2, 'B', true)" class="q-btn-2-B text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">B) Nel punto di equilibrio ($x = 0$)</button>
+                            <button onclick="checkQuiz(2, 'C', false)" class="q-btn-2-C text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">C) La velocità è sempre costante</button>
+                        </div>
+                        <div id="q2-feedback" class="text-xs font-semibold hidden"></div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-3" id="q3">
+                        <p class="font-medium text-slate-200">3. Cosa rappresenta il segno meno nella formula della legge di Hooke $F = -k x$?</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                            <button onclick="checkQuiz(3, 'A', true)" class="q-btn-3-A text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">A) Che la forza si oppone sempre allo spostamento</button>
+                            <button onclick="checkQuiz(3, 'B', false)" class="q-btn-3-B text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">B) Che l'energia del sistema si riduce nel tempo</button>
+                            <button onclick="checkQuiz(3, 'C', false)" class="q-btn-3-C text-left p-2.5 bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition">C) Che la molla può solo essere compressa</button>
+                        </div>
+                        <div id="q3-feedback" class="text-xs font-semibold hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT SIMULATION LOGIC -->
+    <script>
+        // Physics Engine State Variables
+        let state = {
+            k: 50.0,       // N/m
+            m: 1.0,        // kg
+            b: 0.20,       // Ns/m (damping coefficient)
+            g: 9.81,       // m/s^2 (gravity)
+            x: 0.8,        // displacement from equilibrium (meters)
+            v: 0.0,        // velocity (m/s)
+            a: 0.0,        // acceleration (m/s^2)
+            E_diss: 0.0,   // dissipated energy (Joules)
+            orientation: 'horizontal', // 'horizontal' or 'vertical'
+            isPlaying: true,
+            isDragging: false,
+            time: 0.0
+        };
+
+        // Graphing history buffer (max points)
+        const historyLength = 250;
+        let historyX = [];
+        let historyV = [];
+        let historyA = [];
+
+        // Scale factors for rendering canvas
+        const METERS_TO_PIXELS = 120; // 1 meter = 120 pixels
+
+        // Canvas & Context References
+        let canvas, ctx;
+        let graphCanvas, graphCtx;
+
+        // Interactive mouse state
+        let dragOffset = 0;
+
+        window.onload = function() {
+            canvas = document.getElementById('simCanvas');
+            ctx = canvas.getContext('2d');
+
+            graphCanvas = document.getElementById('graphCanvas');
+            graphCtx = graphCanvas.getContext('2d');
+
+            // Responsive Canvas Resize
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+
+            // Drag and drop event listeners
+            canvas.addEventListener('mousedown', onPointerDown);
+            canvas.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+
+            canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+            canvas.addEventListener('touchmove', onPointerMove, { passive: false });
+            window.addEventListener('touchend', onPointerUp);
+
+            // Synchronize parameters from initial sliders
+            updateParams();
+
+            // Start animation loop
+            lastTimestamp = performance.now();
+            requestAnimationFrame(simLoop);
+        };
+
+        function resizeCanvases() {
+            const container = document.getElementById('canvasContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            const graphContainer = graphCanvas.parentElement;
+            graphCanvas.width = graphContainer.clientWidth;
+            graphCanvas.height = graphContainer.clientHeight;
+        }
+
+        // Update Physics Controls Sliders
+        function updateParams() {
+            state.k = parseFloat(document.getElementById('sliderK').value);
+            state.m = parseFloat(document.getElementById('sliderM').value);
+            state.b = parseFloat(document.getElementById('sliderB').value);
+            state.g = parseFloat(document.getElementById('sliderG').value);
+
+            // UI Label updates
+            document.getElementById('lblK').innerText = state.k.toFixed(0);
+            document.getElementById('lblM').innerText = state.m.toFixed(1);
+            document.getElementById('lblB').innerText = state.b.toFixed(2);
+            document.getElementById('lblG').innerText = state.g.toFixed(1);
+
+            // Calculate Theoretical Period T = 2 * pi * sqrt(m / k)
+            const period = 2 * Math.PI * Math.sqrt(state.m / state.k);
+            const frequency = 1 / period;
+            document.getElementById('valPeriod').innerText = period.toFixed(2) + ' s';
+            document.getElementById('valFreq').innerText = frequency.toFixed(2);
+
+            draw();
+        }
+
+        function setOrientation(mode) {
+            state.orientation = mode;
+            const btnH = document.getElementById('btnHorizontal');
+            const btnV = document.getElementById('btnVertical');
+
+            if (mode === 'horizontal') {
+                btnH.className = "px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-600 text-white transition";
+                btnV.className = "px-2.5 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition";
+            } else {
+                btnV.className = "px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-600 text-white transition";
+                btnH.className = "px-2.5 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition";
+            }
+            resetSim();
+        }
+
+        function setPreset(presetName) {
+            if (presetName === 'ideal') {
+                document.getElementById('sliderK').value = 50;
+                document.getElementById('sliderM').value = 1.0;
+                document.getElementById('sliderB').value = 0.0;
+            } else if (presetName === 'damped') {
+                document.getElementById('sliderK').value = 60;
+                document.getElementById('sliderM').value = 1.0;
+                document.getElementById('sliderB').value = 0.5;
+            } else if (presetName === 'critical') {
+                // b_crit = 2 * sqrt(m * k) = 2 * sqrt(1 * 50) = 14.14 (scaled for slider)
+                document.getElementById('sliderK').value = 25;
+                document.getElementById('sliderM').value = 1.0;
+                document.getElementById('sliderB').value = 3.8;
+            } else if (presetName === 'heavy') {
+                document.getElementById('sliderK').value = 40;
+                document.getElementById('sliderM').value = 4.5;
+                document.getElementById('sliderB').value = 0.1;
+            }
+            updateParams();
+            resetSim();
+        }
+
+        function togglePlay() {
+            state.isPlaying = !state.isPlaying;
+            document.getElementById('playText').innerText = state.isPlaying ? "Pausa" : "Play";
+            document.getElementById('playIcon').className = state.isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
+        }
+
+        function stepSim() {
+            state.isPlaying = false;
+            document.getElementById('playText').innerText = "Play";
+            document.getElementById('playIcon').className = "fa-solid fa-play";
+            updatePhysics(0.016);
+            draw();
+        }
+
+        function resetSim() {
+            state.x = 0.7; // default stretch
+            state.v = 0.0;
+            state.a = 0.0;
+            state.E_diss = 0.0;
+            state.time = 0.0;
+            historyX = [];
+            historyV = [];
+            historyA = [];
+            draw();
+        }
+
+        // Numerical Integration Loop (Euler-Cromer)
+        let lastTimestamp = 0;
+        function simLoop(timestamp) {
+            let dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            // Cap maximum delta time to prevent instability on tab switch
+            if (dt > 0.05) dt = 0.05;
+
+            if (state.isPlaying && !state.isDragging) {
+                // Perform sub-stepping for smooth physics stability
+                const subSteps = 10;
+                const subDt = dt / subSteps;
+                for (let i = 0; i < subSteps; i++) {
+                    updatePhysics(subDt);
+                }
+            }
+
+            draw();
+            requestAnimationFrame(simLoop);
+        }
+
+        function updatePhysics(dt) {
+            // Differential Equation: m*a = -k*x - b*v (+ m*g if vertical)
+            // Note: If vertical, displacement equilibrium shifts by delta_x = m*g/k.
+            // Relative to equilibrium position x = 0:
+            let forceElastic = -state.k * state.x;
+            let forceDamping = -state.b * state.v;
+            
+            // Net acceleration
+            state.a = (forceElastic + forceDamping) / state.m;
+
+            // Euler-Cromer Integration
+            state.v += state.a * dt;
+            state.x += state.v * dt;
+
+            // Track dissipated energy power P = b * v^2
+            let powerDissipated = state.b * state.v * state.v;
+            state.E_diss += powerDissipated * dt;
+
+            state.time += dt;
+
+            // Record history for dynamic plots
+            if (historyX.length >= historyLength) {
+                historyX.shift();
+                historyV.shift();
+                historyA.shift();
+            }
+            historyX.push(state.x);
+            historyV.push(state.v);
+            historyA.push(state.a);
+        }
+
+        // Main Rendering Routine
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const isVert = state.orientation === 'vertical';
+            const centerX = canvas.width / (isVert ? 2 : 4);
+            const centerY = canvas.height / (isVert ? 4 : 2);
+
+            // Compute visual mass position
+            const equilibriumShift = (isVert && state.g > 0) ? (state.m * state.g / state.k) : 0;
+            const displacementPixels = state.x * METERS_TO_PIXELS;
+            
+            let anchorX, anchorY, massX, massY;
+
+            if (isVert) {
+                anchorX = canvas.width / 2;
+                anchorY = 40;
+                massX = anchorX;
+                massY = anchorY + 140 + (equilibriumShift * METERS_TO_PIXELS) + displacementPixels;
+            } else {
+                anchorX = 50;
+                anchorY = canvas.height / 2;
+                massX = anchorX + 220 + displacementPixels;
+                massY = anchorY;
+            }
+
+            // Equilibrium Position Line Reference
+            const eqX = isVert ? anchorX : (anchorX + 220);
+            const eqY = isVert ? (anchorY + 140 + equilibriumShift * METERS_TO_PIXELS) : anchorY;
+
+            drawEquilibriumReference(eqX, eqY, isVert);
+
+            // Draw Wall / Ceiling Anchor
+            drawAnchor(anchorX, anchorY, isVert);
+
+            // Draw Spring Coil
+            drawSpring(ctx, anchorX, anchorY, massX, massY, 18, 16);
+
+            // Draw Mass Block
+            drawMass(massX, massY);
+
+            // Draw Physics Vectors
+            const showForce = document.getElementById('chkForce').checked;
+            const showVel = document.getElementById('chkVel').checked;
+            const showAcc = document.getElementById('chkAcc').checked;
+
+            if (showForce) {
+                const forceMag = -state.k * state.x;
+                drawVector(massX, massY, isVert ? 0 : forceMag * 1.5, isVert ? forceMag * 1.5 : 0, '#f43f5e', 'F_el');
+            }
+            if (showVel) {
+                drawVector(massX, massY, isVert ? 0 : state.v * 25, isVert ? state.v * 25 : 0, '#10b981', 'v');
+            }
+            if (showAcc) {
+                drawVector(massX, massY, isVert ? 0 : state.a * 5, isVert ? state.a * 5 : 0, '#f59e0b', 'a');
+            }
+
+            // Update UI Data Displays
+            updateDataUI();
+
+            // Draw Graphs & Energy
+            drawGraphs();
+            updateEnergyBars();
+        }
+
+        // Draw Equilibrium Reference Marker
+        function drawEquilibriumReference(x, y, isVert) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            if (isVert) {
+                ctx.moveTo(x - 80, y);
+                ctx.lineTo(x + 80, y);
+            } else {
+                ctx.moveTo(x, y - 80);
+                ctx.lineTo(x, y + 80);
+            }
+            ctx.stroke();
+
+            // Text Label
+            ctx.fillStyle = '#818cf8';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.fillText('Equilibrio (x = 0)', isVert ? x + 90 : x - 40, isVert ? y + 4 : y - 88);
+            ctx.restore();
+        }
+
+        // Draw Wall Anchor
+        function drawAnchor(x, y, isVert) {
+            ctx.save();
+            ctx.fillStyle = '#334155';
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+
+            if (isVert) {
+                ctx.fillRect(x - 60, y - 15, 120, 15);
+                ctx.strokeRect(x - 60, y - 15, 120, 15);
+            } else {
+                ctx.fillRect(x - 15, y - 60, 15, 120);
+                ctx.strokeRect(x - 15, y - 60, 15, 120);
+            }
+            ctx.restore();
+        }
+
+        // Draw Realistic Coil Spring
+        function drawSpring(ctx, x1, y1, x2, y2, coils, radius) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dist = Math.hypot(dx, dy);
+            const angle = Math.atan2(dy, dx);
+
+            ctx.save();
+            ctx.translate(x1, y1);
+            ctx.rotate(angle);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+
+            const leadLength = 20;
+            const springLength = dist - 2 * leadLength - 30; // 30px offset for mass connection
+
+            ctx.moveTo(0, 0);
+            ctx.lineTo(leadLength, 0);
+
+            if (springLength > 0) {
+                const step = springLength / coils;
+                for (let i = 0; i < coils; i++) {
+                    const xSeg = leadLength + i * step;
+                    ctx.lineTo(xSeg + step * 0.25, -radius);
+                    ctx.lineTo(xSeg + step * 0.75, radius);
+                    ctx.lineTo(xSeg + step, 0);
+                }
+            }
+
+            ctx.lineTo(dist - 30, 0);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Draw Metallic Mass Block
+        function drawMass(x, y) {
+            const size = 50;
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 4;
+
+            // Block Fill with Metallic Gradient
+            const grad = ctx.createLinearGradient(-size/2, -size/2, size/2, size/2);
+            grad.addColorStop(0, '#4f46e5');
+            grad.addColorStop(1, '#312e81');
+
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = state.isDragging ? '#6366f1' : '#818cf8';
+            ctx.lineWidth = state.isDragging ? 3 : 1.5;
+
+            ctx.beginPath();
+            ctx.roundRect(-size/2, -size/2, size, size, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Mass Label Text
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(state.m.toFixed(1) + ' kg', 0, 0);
+
+            ctx.restore();
+        }
+
+        // Draw Vector Arrow
+        function drawVector(x, y, vx, vy, color, label) {
+            const mag = Math.hypot(vx, vy);
+            if (mag < 2) return;
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + vx, y + vy);
+            ctx.stroke();
+
+            // Arrowhead
+            const angle = Math.atan2(vy, vx);
+            const headLen = 8;
+            ctx.beginPath();
+            ctx.moveTo(x + vx, y + vy);
+            ctx.lineTo(x + vx - headLen * Math.cos(angle - Math.PI / 6), y + vy - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x + vx - headLen * Math.cos(angle + Math.PI / 6), y + vy - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            // Label Text
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.fillText(label, x + vx + 8 * Math.cos(angle), y + vy + 8 * Math.sin(angle));
+
+            ctx.restore();
+        }
+
+        // Pointer Drag & Drop Interactivity
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function onPointerDown(e) {
+            const pos = getPointerPos(e);
+            const isVert = state.orientation === 'vertical';
+
+            const anchorX = isVert ? canvas.width / 2 : 50;
+            const anchorY = isVert ? 40 : canvas.height / 2;
+            const equilibriumShift = (isVert && state.g > 0) ? (state.m * state.g / state.k) : 0;
+            const displacementPixels = state.x * METERS_TO_PIXELS;
+
+            const massX = isVert ? anchorX : (anchorX + 220 + displacementPixels);
+            const massY = isVert ? (anchorY + 140 + equilibriumShift * METERS_TO_PIXELS + displacementPixels) : anchorY;
+
+            // Distance to mass center
+            const dist = Math.hypot(pos.x - massX, pos.y - massY);
+            if (dist < 35) {
+                state.isDragging = true;
+                state.v = 0;
+                dragOffset = isVert ? (pos.y - massY) : (pos.x - massX);
+                e.preventDefault();
+            }
+        }
+
+        function onPointerMove(e) {
+            if (!state.isDragging) return;
+            const pos = getPointerPos(e);
+            const isVert = state.orientation === 'vertical';
+
+            const anchorX = isVert ? canvas.width / 2 : 50;
+            const anchorY = isVert ? 40 : canvas.height / 2;
+            const equilibriumShift = (isVert && state.g > 0) ? (state.m * state.g / state.k) : 0;
+
+            if (isVert) {
+                const eqY = anchorY + 140 + equilibriumShift * METERS_TO_PIXELS;
+                state.x = (pos.y - dragOffset - eqY) / METERS_TO_PIXELS;
+            } else {
+                const eqX = anchorX + 220;
+                state.x = (pos.x - dragOffset - eqX) / METERS_TO_PIXELS;
+            }
+
+            state.v = 0;
+            state.a = (-state.k * state.x) / state.m;
+            draw();
+            e.preventDefault();
+        }
+
+        function onPointerUp() {
+            if (state.isDragging) {
+                state.isDragging = false;
+            }
+        }
+
+        // Draw Real-time Signal Plot Canvas
+        function drawGraphs() {
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            const midY = h / 2;
+
+            // Axis line
+            graphCtx.strokeStyle = '#334155';
+            graphCtx.lineWidth = 1;
+            graphCtx.beginPath();
+            graphCtx.moveTo(0, midY);
+            graphCtx.lineTo(w, midY);
+            graphCtx.stroke();
+
+            if (historyX.length < 2) return;
+
+            const stepX = w / historyLength;
+
+            // Plot Position x(t)
+            plotSeries(historyX, '#818cf8', 1.5, 40);
+            // Plot Velocity v(t)
+            plotSeries(historyV, '#34d399', 1.2, 15);
+            // Plot Acceleration a(t)
+            plotSeries(historyA, '#fbbf24', 1.0, 5);
+        }
+
+        function plotSeries(data, color, strokeWidth, scale) {
+            const h = graphCanvas.height;
+            const midY = h / 2;
+            const stepX = graphCanvas.width / historyLength;
+
+            graphCtx.save();
+            graphCtx.strokeStyle = color;
+            graphCtx.lineWidth = strokeWidth;
+            graphCtx.beginPath();
+
+            for (let i = 0; i < data.length; i++) {
+                const x = i * stepX;
+                const y = midY - data[i] * scale;
+                if (i === 0) graphCtx.moveTo(x, y);
+                else graphCtx.lineTo(x, y);
+            }
+            graphCtx.stroke();
+            graphCtx.restore();
+        }
+
+        // Update Energy Bars & Data Displays
+        function updateEnergyBars() {
+            const Ep = 0.5 * state.k * state.x * state.x;
+            const Ek = 0.5 * state.m * state.v * state.v;
+            const Ediss = state.E_diss;
+            const Etot = Ep + Ek + Ediss;
+
+            document.getElementById('lblEp').innerText = Ep.toFixed(2) + ' J';
+            document.getElementById('lblEk').innerText = Ek.toFixed(2) + ' J';
+            document.getElementById('lblEdiss').innerText = Ediss.toFixed(2) + ' J';
+            document.getElementById('lblETot').innerText = Etot.toFixed(2) + ' J';
+
+            // Percentages relative to total initial/current max energy
+            const maxE = Math.max(0.001, Etot);
+            document.getElementById('barEp').style.width = Math.min(100, (Ep / maxE) * 100) + '%';
+            document.getElementById('barEk').style.width = Math.min(100, (Ek / maxE) * 100) + '%';
+            document.getElementById('barEdiss').style.width = Math.min(100, (Ediss / maxE) * 100) + '%';
+        }
+
+        function updateDataUI() {
+            document.getElementById('valX').innerText = (state.x >= 0 ? '+' : '') + state.x.toFixed(2) + ' m';
+            document.getElementById('valV').innerText = state.v.toFixed(2) + ' m/s';
+            document.getElementById('valA').innerText = state.a.toFixed(2) + ' m/s²';
+            document.getElementById('valF').innerText = (-state.k * state.x).toFixed(2) + ' N';
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.getElementById('tabTheory').classList.add('hidden');
+            document.getElementById('tabExperiments').classList.add('hidden');
+            document.getElementById('tabQuiz').classList.add('hidden');
+
+            document.getElementById('tabTheoryBtn').className = "px-5 py-3 text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap";
+            document.getElementById('tabExpBtn').className = "px-5 py-3 text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap";
+            document.getElementById('tabQuizBtn').className = "px-5 py-3 text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap";
+
+            if (tabId === 'theory') {
+                document.getElementById('tabTheory').classList.remove('hidden');
+                document.getElementById('tabTheoryBtn').className = "px-5 py-3 text-indigo-400 border-b-2 border-indigo-500 font-semibold flex items-center gap-2 whitespace-nowrap";
+            } else if (tabId === 'experiments') {
+                document.getElementById('tabExperiments').classList.remove('hidden');
+                document.getElementById('tabExpBtn').className = "px-5 py-3 text-indigo-400 border-b-2 border-indigo-500 font-semibold flex items-center gap-2 whitespace-nowrap";
+            } else if (tabId === 'quiz') {
+                document.getElementById('tabQuiz').classList.remove('hidden');
+                document.getElementById('tabQuizBtn').className = "px-5 py-3 text-indigo-400 border-b-2 border-indigo-500 font-semibold flex items-center gap-2 whitespace-nowrap";
+            }
+        }
+
+        // Quiz State Management
+        let quizAnswers = { 1: false, 2: false, 3: false };
+
+        function checkQuiz(qNum, option, isCorrect) {
+            const feedbackEl = document.getElementById(`q${qNum}-feedback`);
+            feedbackEl.classList.remove('hidden', 'text-emerald-400', 'text-rose-400');
+
+            if (isCorrect) {
+                feedbackEl.innerText = "✓ Corretto! Ottima risposta.";
+                feedbackEl.classList.add('text-emerald-400');
+                quizAnswers[qNum] = true;
+            } else {
+                feedbackEl.innerText = "✗ Errato. Riprova o consulta i richiami teorici!";
+                feedbackEl.classList.add('text-rose-400');
+                quizAnswers[qNum] = false;
+            }
+
+            // Update total score
+            const score = Object.values(quizAnswers).filter(Boolean).length;
+            document.getElementById('quizScore').innerText = `${score} / 3`;
+        }
+    </script>
+</body>
+</html>
