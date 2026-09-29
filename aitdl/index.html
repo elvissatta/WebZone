@@ -190,7 +190,7 @@ S.push(
   '<b>Quadro normativo ed etico</b>: AI Act, rischi, bias, privacy, responsabilità, linee guida MIM',
   '<b>Prompting</b>: definizione, tipologie, struttura di un prompt efficace',
   '<b>Le principali AI generative</b>',
-  '<b>Hardware e software</b> per laboratori e workshop',
+  '<b>Gestione di hardware e software</b> dei dispositivi per laboratori e workshop',
   '<b>AI per la manutenzione</b> delle attrezzature']),
  say:`<p>Prima le regole del gioco, poi la pratica: come si parla a un’IA, quali strumenti esistono, come si preparano i dispositivi e come l’IA aiuta a mantenere le attrezzature.</p>`},
 
@@ -284,31 +284,60 @@ S.push(
  say:`<p>Tanti strumenti, stessa logica: cambiano interfaccia, condizioni d’uso e punti di forza. Conviene provarne più di uno sullo stesso compito.</p>`,
  prec:`<p>Il mercato cambia in fretta: nomi, versioni e piani gratuiti vanno controllati prima della lezione.</p>`},
 
-{sec:4,title:'Hardware per laboratori AI e workshop',
+{sec:4,title:'Dispositivi per laboratori AI e workshop',
  body:`<div class="cols3">
- ${box('PC / workstation','CPU recente, 16–32 GB di RAM|<b>GPU</b> per modelli locali e addestramento|SSD capiente')}
- ${box('Dispositivi edge','Raspberry Pi, schede tipo Jetson|IA vicino ai sensori|Basso consumo')}
- ${box('Cloud','Servizi online come Google Colab|Nessuna GPU da acquistare|Servono connessione e attenzione ai dati')}
+ ${box('Postazioni','PC o portatili con browser aggiornato|Monitor, mouse, cuffie se servono|Un’etichetta e un numero per ogni dispositivo')}
+ ${box('Rete e corrente','Wi-Fi stabile e testata prima del workshop|Prese e ciabatte sufficienti|Cavi in ordine, mai nei passaggi')}
+ ${box('Spazi','Lontano da liquidi, polveri e reagenti|Buona ventilazione dei dispositivi|Postazioni informatiche separate dal banco di lavoro')}
  </div>`,
- say:`<p>Per un workshop base bastano browser e cloud; l’hardware dedicato serve quando i dati non devono uscire dal laboratorio o si lavora su sensori.</p>`},
+ say:`<p>Per un workshop di IA non serve una macchina speciale: bastano dispositivi normali, ben tenuti, con connessione affidabile. Il vero rischio, in un laboratorio, è mettere un computer dove ci sono acqua, solventi o polvere di fibre.</p>`,
+ lab:`<p>Chimica: schermo e tastiera lontani dagli schizzi, meglio una postazione dedicata. Tessile: la polvere di fibre entra nelle ventole e le intasa. Fisica: attenzione ai cavi dei dispositivi vicino a quelli degli strumenti di misura.</p>`},
 
-{sec:4,title:'Software e gestione dei dispositivi',
+{sec:4,title:'Aggiornamento e sicurezza dei PC',
  body:li([
-  '<b>Python</b> e <b>Jupyter</b> per esperimenti e analisi dati',
-  'Modelli locali (es. Ollama, LM Studio) quando serve <b>privacy</b>',
-  'Strumenti senza codice, come Teachable Machine',
-  'Gestione: aggiornamenti, <b>ambienti virtuali</b>, account di classe, backup, immagini di sistema da ripristinare']),
- say:`<p>Un laboratorio ordinato è riproducibile: stesse versioni, stesse configurazioni, postazione ripristinabile a fine lezione.</p>`,
- lab:`<p>Prepara un’immagine standard del PC di laboratorio con librerie e modelli già installati: il workshop parte in pochi minuti.</p>`},
+  'Aggiornare <b>sistema e browser</b> con regolarità, non il giorno del workshop',
+  '<b>Antivirus</b> attivo e non disattivato per «far prima»',
+  'Account separati per docenti e studenti, <b>password</b> non condivise',
+  '<b>Backup</b> dei file importanti e spegnimento corretto a fine giornata',
+  'Software solo se <b>autorizzato</b> dalla scuola; per dubbi, il referente informatico']),
+ say:`<p>Un PC aggiornato e protetto riduce guasti, perdite di dati e rischi di sicurezza. Gli aggiornamenti vanno pianificati fuori dall’orario di lezione, così non bloccano un’attività a metà.</p>`,
+ lab:`<p>Un promemoria mensile: aggiornamenti, controllo dei backup, verifica dei dispositivi collegati a strumenti di misura.</p>`},
+
+{sec:4,title:'Cura e rispetto delle attrezzature',
+ body:li([
+  'Niente <b>cibo e bevande</b> vicino ai dispositivi',
+  'Pulizia con panni adatti e dispositivo spento; niente prodotti aggressivi su schermi e tastiere',
+  'Batterie e carica: usare i caricabatterie originali, non coprire i dispositivi',
+  'Ogni anomalia va <b>segnalata subito</b>: rumori, surriscaldamento, cavi danneggiati',
+  'Inventario aggiornato: chi ha usato cosa e in che stato è stato lasciato']),
+ say:`<p>Le buone abitudini valgono per tutte le attrezzature del laboratorio, non solo per i computer. Un dispositivo curato dura di più e segnala meglio i problemi.</p>`,
+ prec:`<p>In caso di odori strani, fumo o surriscaldamento si spegne, si scollega e si avvisa il responsabile: nessun tentativo di riparazione fai-da-te.</p>`},
+
+{sec:4,title:'Buone pratiche sull’uso dell’IA a scuola',
+ body:li([
+  'Usare strumenti e <b>account approvati</b> dalla scuola',
+  'Niente <b>dati personali</b> di studenti, colleghi o fornitori nei chatbot',
+  'Ogni risposta va <b>verificata</b> con fonti e procedure ufficiali',
+  'Dichiarare quando un materiale è stato prodotto con l’IA',
+  'Nei dubbi sulla privacy, chiedere prima al referente o al dirigente']),
+ say:`<p>Sono le regole viste nel quadro normativo, tradotte in gesti quotidiani. Servono soprattutto quando si lavora con più persone sugli stessi dispositivi.</p>`,
+ lab:`<p>Prima di incollare un registro di taratura in un chatbot, togli nomi, matricole e riferimenti riservati.</p>`},
 
 {sec:5,title:'AI per la manutenzione delle attrezzature',
- body:`${flow(['Sensori','Dati','Modello','Allarme'])}${li([
-  '<b>Manutenzione predittiva</b>: intervenire prima del guasto',
-  'Analisi di vibrazioni, temperature, correnti, cicli d’uso',
-  'Assistenti che consultano manuali e storico degli interventi',
-  'Meno fermi macchina, ma servono <b>dati puliti</b> e controllo umano'])}`,
- say:`<p>L’IA riconosce schemi anomali nei dati prima che diventino guasti. Il tecnico resta chi verifica e interviene.</p>`,
- lab:`<p>Una centrifuga o un forno con sensore di vibrazione o temperatura: l’IA segnala la deriva, tu decidi la manutenzione.</p>`},
+ body:`${flow(['Manuale e storico','Domanda all’IA','Proposta','Verifica del tecnico'])}<div class="cols3">
+ ${box('Documentazione','Riassume manuali e schede tecniche|Aiuta a trovare in fretta le istruzioni giuste')}
+ ${box('Pianificazione','Prepara checklist di controllo|Ricorda scadenze, tarature e sostituzioni')}
+ ${box('Diagnosi e registro','Suggerisce possibili cause di un’anomalia|Ordina il registro degli interventi')}
+ </div>`,
+ say:`<p>L’IA è un assistente per organizzare il lavoro: riassume manuali, prepara checklist, aiuta a ragionare su un guasto e tiene ordinato il registro degli interventi. La decisione e l’intervento restano al tecnico.</p>`,
+ prec:`<p>Il manuale del costruttore e le procedure di sicurezza hanno sempre la precedenza sulla risposta di un’IA.</p>`},
+
+{sec:5,title:'Prompt utili per la manutenzione',
+ body:`<div class="pr"><p><b>Ruolo</b>Sei un assistente per un laboratorio scolastico di chimica.</p><p><b>Contesto</b>Qui sotto trovi il testo del manuale di uno spettrofotometro, senza dati personali.</p><p><b>Compito e formato</b>Prepara una checklist di manutenzione mensile in 8 punti.</p><p><b>Vincoli</b>Usa solo il manuale; dove manca l’informazione, scrivi «da verificare».</p></div>${li([
+  'Altri usi: <b>registro degli interventi</b>, promemoria, guida ai sintomi di un guasto',
+  'Si copia il manuale (pagine utili), non si incollano dati riservati'])}`,
+ say:`<p>Il prompt con vincoli chiari riduce le invenzioni: se chiedi di attenersi al manuale e di segnalare ciò che manca, il risultato è più affidabile e controllabile.</p>`,
+ lab:`<p>Prova a farti generare la checklist per una macchina del tuo laboratorio e confrontala con quella ufficiale: dove differiscono?</p>`},
 
 {sec:5,title:'In sintesi',
  body:li([
@@ -316,8 +345,9 @@ S.push(
   'Bias, privacy e spiegabilità sono temi <b>pratici</b>',
   'La responsabilità resta <b>umana</b>',
   'Un buon prompt: ruolo, contesto, compito, formato, vincoli',
-  'Scegli strumenti e dispositivi in base a dati e obiettivi']),
- say:`<p>Usare bene l’IA significa capirne i limiti, proteggere i dati e controllare sempre il risultato.</p>`}
+  'Dispositivi <b>aggiornati, protetti e curati</b>; IA solo con account e dati adeguati',
+  'L’IA aiuta la manutenzione, ma il tecnico <b>verifica sempre</b>']),
+ say:`<p>Usare bene l’IA in laboratorio significa capirne i limiti, proteggere i dati, curare le attrezzature e controllare sempre il risultato.</p>`}
 );
 
 /* ---------- motore ---------- */
