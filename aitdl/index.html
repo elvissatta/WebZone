@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI per i tecnici di laboratorio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:inherit}
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EDF1F4; --card:#FFFFFF; --ink:#15232D; --muted:#4F626F; --line:#CBD5DC; --script:#E2E9EE; --focus:#2F6BD8;
+  --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --serif:'Literata',Georgia,'Times New Roman',serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0E1920;--card:#15262F;--ink:#E7EEF2;--muted:#9FB2BE;--line:#2B3F4B;--script:#12212A;--focus:#7FA6F5}
+}
+:root[data-theme="dark"]{--bg:#0E1920;--card:#15262F;--ink:#E7EEF2;--muted:#9FB2BE;--line:#2B3F4B;--script:#12212A;--focus:#7FA6F5}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans)}
+button,select{font-family:var(--sans)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* barra superiore */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.brand{font-weight:700;font-size:15px;white-space:nowrap}
+.strip{display:flex;gap:3px;flex:1 1 400px;min-width:260px}
+.seg{flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--muted);font:500 11.5px/1.25 var(--sans)}
+.seg i{display:block;height:8px;background:var(--c);margin-bottom:5px}
+.seg[aria-current="true"]{color:var(--ink);font-weight:700}
+.seg[aria-current="true"] i{outline:2px solid var(--ink);outline-offset:1px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn,select{font:600 13.5px var(--sans);padding:7px 12px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:4px;cursor:pointer}
+.btn:hover{background:var(--ink);color:var(--bg)}
+select{max-width:210px;font-weight:500}
+.count{font-size:13px;color:var(--muted);min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* struttura slide */
+.wrap{max-width:1300px;margin:0 auto;padding:22px 20px 70px}
+.slide{display:none}
+.slide.on{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-top:8px solid var(--sc);border-radius:6px;padding:28px 32px 16px;min-height:460px;display:flex;flex-direction:column;font-size:17px}
+.card h2{font-size:clamp(25px,3vw,34px);line-height:1.15;letter-spacing:-.012em;font-weight:700;margin:0 0 18px}
+.card .body{flex:1}
+.card footer{display:flex;justify-content:space-between;gap:12px;margin-top:22px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.lead{font-size:1.22em;line-height:1.35;font-weight:550;margin:0 0 16px}
+.small{font-size:.88em;color:var(--muted)}
+.body p{margin:0 0 .8em;line-height:1.5}
+
+/* liste e blocchi */
+ul.k{list-style:none;padding:0;margin:0 0 6px}
+ul.k li{position:relative;padding-left:22px;margin:.55em 0;line-height:1.42}
+ul.k li::before{content:"";position:absolute;left:1px;top:.52em;width:9px;height:9px;background:var(--sc);border-radius:1px}
+.cols2,.cols3,.cols4{display:grid;gap:12px;margin:12px 0}
+.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.box{border:1px solid var(--line);border-left:5px solid var(--sc);border-radius:4px;padding:11px 14px 12px}
+.box h4{margin:0 0 5px;font-size:1em;font-weight:700;line-height:1.25}
+.box p{margin:0;font-size:.88em;line-height:1.42;color:var(--muted)}
+.box p+p{margin-top:.5em}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--script);color:var(--ink);margin-left:6px;vertical-align:1px}
+.tw{overflow-x:auto;margin:6px 0}
+table.t{width:100%;border-collapse:collapse;font-size:.86em;line-height:1.35}
+table.t th{text-align:left;font-weight:700;border-bottom:2px solid var(--ink);padding:6px 10px 6px 0;white-space:nowrap}
+table.t td{border-bottom:1px solid var(--line);padding:8px 10px 8px 0;vertical-align:top}
+table.t td:first-child{font-weight:600}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0 16px}
+.flow .n{border:1.5px solid var(--ink);background:var(--card);border-radius:4px;padding:7px 11px;font-size:.86em;line-height:1.3;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.flow .n small{display:block;color:var(--muted);font-size:.84em}
+.flow .a{color:var(--muted);align-self:center;font-size:1.05em}
+.tl .r{display:grid;grid-template-columns:86px 1fr;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.92em;line-height:1.38}
+.tl .y{font-weight:700;font-variant-numeric:tabular-nums}
+.eq{font-family:var(--serif);font-size:1.05em;background:var(--script);padding:9px 14px;border-radius:4px;margin:10px 0;overflow-x:auto;white-space:nowrap}
+.bar{display:flex;height:34px;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;font-size:.8em;margin:12px 0}
+.bar span{display:flex;align-items:center;padding:0 10px;white-space:nowrap}
+.bar .l{background:var(--sc);color:#15232D;font-weight:600}
+.bar .u{flex:1;background:repeating-linear-gradient(135deg,var(--card) 0 6px,var(--script) 6px 12px);color:var(--ink)}
+.scale{margin:14px 0}
+.scale .g{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--sc),var(--ink))}
+.scale .m{display:flex;justify-content:space-between;font-size:.8em;margin-top:6px;gap:8px}
+.scale .m span{flex:1}.scale .m span:nth-child(2){text-align:center}.scale .m span:last-child{text-align:right}
+.bigstrip{display:flex;gap:4px;margin:26px 0 16px}
+.bigstrip span{flex:1;border-top:38px solid var(--c);padding:9px 6px 0 0;font-size:13px;line-height:1.25;font-weight:600}
+.hero h2{font-size:clamp(38px,6vw,68px);line-height:1.02;margin-bottom:18px}
+.hero .lead{font-size:1.4em;max-width:26ch}
+.mp{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}
+.g4,.g2{display:grid;gap:2px}.g4{grid-template-columns:repeat(4,32px)}.g2{grid-template-columns:repeat(2,32px)}
+.g4 span,.g2 span{display:grid;place-items:center;height:32px;font-size:14px;border:1px solid var(--line);background:var(--card)}
+.g4 .ta{background:color-mix(in srgb,var(--sc) 30%,var(--card))}
+.g4 .mx{font-weight:700;outline:2px solid var(--ink);outline-offset:-2px}
+.mp .a{font-size:.8em;color:var(--muted)}
+dl.gl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px;margin:0;font-size:.82em;line-height:1.35}
+dl.gl div{padding:5px 0;border-bottom:1px solid var(--line)}
+dl.gl dt{font-weight:700;display:inline}dl.gl dd{display:inline;margin:0}
+dl.gl dt::after{content:": "}
+
+/* diagrammi */
+svg.dg{width:100%;height:auto;max-height:290px;display:block;margin:6px 0 10px}
+.dg text{font:12px var(--sans);fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:11px}
+.dg .ax{stroke:var(--muted);stroke-width:1.5}
+.dg .fit{stroke:var(--sc);stroke-width:3.5}
+.dg .res{stroke:var(--ink);stroke-dasharray:3 3;stroke-width:1.5}
+.dg .pt circle{fill:var(--ink)}
+.dg .ed line{stroke:var(--muted);stroke-width:.8;opacity:.5}
+.dg .io{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.dg .hid{fill:var(--sc);stroke:var(--ink);stroke-width:1.2}
+.dg .bx{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.dg .bs{fill:color-mix(in srgb,var(--sc) 38%,var(--card));stroke:var(--ink);stroke-width:1.5}
+.dg .ln{stroke:var(--ink);stroke-width:1.6;fill:none}
+.dg .ld{stroke:var(--muted);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+.dg .ah{fill:var(--ink)}
+
+/* copione */
+.script{background:var(--script);border-radius:6px;padding:22px 26px 10px;font-family:var(--serif);font-size:17px;line-height:1.65}
+.script section{margin-bottom:20px}
+.script h3{font:700 13.5px/1.3 var(--sans);margin:0 0 7px}
+.script p{margin:0 0 .8em}
+.script .prec,.script .lab{background:var(--card);border-left:5px solid var(--sc);padding:12px 16px 4px;border-radius:0 4px 4px 0}
+.script .lab{border-left-style:dashed}
+
+body.solo .slide.on{grid-template-columns:minmax(0,1fr)}
+body.solo .script{display:none}
+body.solo .card{max-width:1120px;margin:0 auto;width:100%;font-size:21px;min-height:520px}
+body.solo .cols3,body.solo .cols4{gap:14px}
+
+@media (max-width:1000px){.slide.on{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:720px){
+  .cols2,.cols3,.cols4,dl.gl{grid-template-columns:minmax(0,1fr)}
+  .card{padding:20px 18px 12px;min-height:0}
+  .seg span{display:none}
+  .wrap{padding:16px 12px 60px}
+  .top{padding:8px 12px;position:static}
+}
+@media print{
+  :root{padding:0}
+  .top{display:none}
+  .slide{display:grid !important;grid-template-columns:1fr;break-after:page;gap:14px}
+  .script{display:block !important}
+  .card{min-height:0}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">AI per i tecnici di laboratorio</div>
+  <nav class="strip" id="strip" aria-label="Sezioni del corso"></nav>
+  <div class="tools">
+    <select id="idx" aria-label="Vai alla slide"></select>
+    <button class="btn" id="tg" type="button">Nascondi copione</button>
+    <button class="btn" id="prev" type="button">Indietro</button>
+    <button class="btn" id="next" type="button">Avanti</button>
+    <span class="count" id="cnt" aria-live="polite"></span>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<script>
+const SEC=[
+ {n:'Apertura',c:'#8AA0AE'},
+ {n:'Quadro normativo ed etico',c:'#E8412D'},
+ {n:'Prompting',c:'#F28A1E'},
+ {n:'AI generative',c:'#2F6BD8'},
+ {n:'Hardware e software',c:'#1FA6A0'},
+ {n:'Manutenzione',c:'#6A3FB5'}
+];
+const li=a=>`<ul class="k">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+const flow=(a,sep='→')=>`<div class="flow">${a.map((x,i)=>(i?`<span class="a" aria-hidden="true">${sep}</span>`:'')+`<span class="n">${x}</span>`).join('')}</div>`;
+const box=(t,p,tag)=>`<div class="box"><h4>${t}${tag?`<span class="tag">${tag}</span>`:''}</h4>${p.split('|').map(x=>`<p>${x}</p>`).join('')}</div>`;
+
+const S=[];
+S.push(
+{sec:0,cls:'hero',title:'AI per i tecnici di laboratorio',
+ body:`<p class="lead">Regole, prompting, strumenti e manutenzione: il corso in sintesi.</p>
+ <div class="bigstrip">${SEC.slice(1,8).map(s=>`<span style="--c:${s.c}">${s.n}</span>`).join('')}</div>`,
+ say:`<p>A sinistra la slide, qui accanto il testo per argomentare. Frecce per spostarsi, <b>S</b> per nascondere il copione quando proietti.</p>`},
+
+{sec:0,title:'Programma',
+ body:li([
+  '<b>Quadro normativo ed etico</b>: AI Act, rischi, bias, privacy, responsabilità, linee guida MIM',
+  '<b>Prompting</b>: definizione, tipologie, struttura di un prompt efficace',
+  '<b>Le principali AI generative</b>',
+  '<b>Hardware e software</b> per laboratori e workshop',
+  '<b>AI per la manutenzione</b> delle attrezzature']),
+ say:`<p>Prima le regole del gioco, poi la pratica: come si parla a un’IA, quali strumenti esistono, come si preparano i dispositivi e come l’IA aiuta a mantenere le attrezzature.</p>`},
+
+{sec:1,title:'AI Act: Regolamento UE 2024/1689',
+ body:`<p class="lead">La prima legge europea sull’IA: regole proporzionate al rischio.</p>${li([
+  'Vale per chi <b>sviluppa</b> e per chi <b>usa</b> sistemi di IA nell’UE',
+  'Obiettivo: IA <b>affidabile</b>, che tuteli salute, sicurezza e diritti fondamentali',
+  'Approccio basato sul <b>rischio</b>: più il rischio è alto, più gli obblighi sono severi',
+  'Applicazione <b>graduale</b> dal 2025'])}`,
+ say:`<p>Non vieta l’IA: la regola in base all’uso che se ne fa. Una scuola o un laboratorio che adotta uno strumento è un «deployer», cioè un utilizzatore con doveri precisi.</p>`,
+ prec:`<p>Il regolamento è entrato in vigore il 1° agosto 2024, ma i vari obblighi scattano a date diverse. Le scadenze più avanzate sono oggetto di discussione a livello europeo: verifica il calendario aggiornato prima di citarle.</p>`},
+
+{sec:1,title:'Classificazione dei rischi',
+ body:`<div class="cols4">
+ ${box('Inaccettabile','Vietato|Es.: punteggio sociale, manipolazione subliminale','vietato')}
+ ${box('Alto','Obblighi severi|Es.: istruzione, selezione del personale, sicurezza di prodotti','regolato')}
+ ${box('Limitato','Trasparenza|Es.: chatbot, contenuti generati o deepfake','da dichiarare')}
+ ${box('Minimo','Nessun obbligo specifico|Es.: filtri antispam, videogiochi','libero')}
+ </div>`,
+ say:`<p>Quattro livelli, come una scala di pericolosità. Un chatbot deve dire di essere una macchina; un sistema che valuta studenti o candidati è ad alto rischio.</p>`,
+ lab:`<p>Assistente che riassume un manuale d’uso: rischio minimo. Sistema che decide chi può accedere a un’area di sicurezza con il riconoscimento del volto: da valutare con molta attenzione.</p>`},
+
+{sec:1,title:'Bias e discriminazione',
+ body:`${flow(['Dati distorti','Modello addestrato','Risultati ingiusti'])}${li([
+  'L’IA impara dai dati: se sono <b>sbilanciati</b>, lo diventa anche il modello',
+  'Esempi: selezione del personale, riconoscimento facciale, valutazioni scolastiche',
+  'Difese: dati rappresentativi, test su gruppi diversi, <b>controllo umano</b>'])}`,
+ say:`<p>Il bias non è cattiveria della macchina: è lo specchio dei dati. Per questo la qualità del dataset è un tema etico oltre che tecnico.</p>`,
+ lab:`<p>Un modello addestrato solo su immagini di pezzi nuovi e puliti sbaglia sui pezzi usurati: è un bias di campionamento.</p>`},
+
+{sec:1,title:'Spiegabilità e privacy',
+ body:`<div class="cols2">
+ ${box('Spiegabilità','Capire <b>perché</b> il sistema ha dato quella risposta|I modelli complessi sono spesso «scatole nere»|Chi decide deve poter motivare e contestare')}
+ ${box('Privacy','Il GDPR vale anche per l’IA|Non inserire <b>dati personali</b> o riservati nei chatbot|Verificare dove finiscono i dati e se servono ad addestrare il modello')}
+ </div>`,
+ say:`<p>Regola pratica: se non lo scriveresti su una cartolina, non incollarlo in un chatbot pubblico.</p>`,
+ lab:`<p>Niente nomi di studenti, risultati di clienti o documenti aziendali nei prompt: si anonimizza prima.</p>`},
+
+{sec:1,title:'Responsabilità umana',
+ body:li([
+  'L’IA <b>supporta</b>, la decisione resta a una persona',
+  '<b>Supervisione umana</b>: chi usa il sistema deve poterlo controllare e fermare',
+  'Verificare sempre le risposte: l’IA può sbagliare in modo convincente',
+  '<b>Alfabetizzazione</b>: chi usa l’IA deve avere competenze adeguate']),
+ say:`<p>«L’ha detto l’IA» non è una giustificazione. La responsabilità di un referto, di una misura o di una scelta resta di chi firma.</p>`,
+ lab:`<p>Un valore suggerito dall’IA per una taratura va controllato con lo strumento e la procedura ufficiale.</p>`},
+
+{sec:1,title:'Linee guida ministeriali del 9 agosto 2025',
+ body:`<p class="lead">Linee guida MIM per l’IA nelle scuole, allegate al DM n. 166.</p>${li([
+  'Approccio <b>antropocentrico</b>, etico e affidabile',
+  'Conformità a AI Act e GDPR; particolare attenzione ai <b>dati dei minori</b>',
+  'Le scuole sono <b>deployer</b>: ruoli e responsabilità definiti',
+  'Progetti e servizi di IA collegati alla piattaforma <b>UNICA</b>'])}`,
+ say:`<p>Sono il riferimento pratico per introdurre l’IA in modo responsabile: principi, ruoli e modalità operative, adattabili alle diverse scuole.</p>`,
+ prec:`<p>Per i dettagli operativi consulta il testo ufficiale sul sito del MIM.</p>`},
+
+{sec:2,title:'Comunicare con un’IA: il ruolo del prompt',
+ body:`<p class="lead">La qualità della risposta dipende dalla qualità della richiesta.</p>${flow(['Prompt','Modello linguistico','Risposta'])}${li([
+  'Il modello non legge nel pensiero: lavora solo su ciò che scrivi',
+  'Un prompt vago produce una risposta generica'])}`,
+ say:`<p>Come con un collega nuovo: più chiaro è il compito, meno correzioni servono.</p>`},
+
+{sec:2,title:'Prompting: definizione',
+ body:`<p class="lead">Prompting: l’arte di formulare istruzioni per guidare un modello linguistico (LLM).</p>${li([
+  'LLM: modello addestrato su enormi quantità di testo, prevede la parola successiva',
+  'Il prompt è l’<b>interfaccia</b> con il modello',
+  'Si migliora per tentativi: scrivi, valuta, <b>affina</b>'])}`,
+ say:`<p>Non serve saper programmare: serve saper spiegare bene cosa si vuole.</p>`},
+
+{sec:2,title:'Tipologie di prompt',
+ body:`<div class="cols3">
+ ${box('Istruttivo','Un comando diretto|«Elenca i passaggi per calibrare un pH-metro»')}
+ ${box('Conversazionale','Un dialogo a più turni|Si chiede, si corregge, si approfondisce')}
+ ${box('Contestuale','Fornisce materiale o background|«Dato questo protocollo, trova gli errori»')}
+ </div>`,
+ say:`<p>Nella pratica si combinano: si parte con un’istruzione, si aggiunge contesto e si rifinisce in conversazione.</p>`},
+
+{sec:2,title:'Struttura di un prompt efficace',
+ body:`${flow(['Ruolo','Contesto','Compito','Formato','Vincoli'])}<div class="eq">«Sei un tecnico di laboratorio chimico. Devo preparare una soluzione tampone per una classe di 20 studenti. Elenca i passaggi in una checklist di 8 punti, senza dosaggi da verificare. Segnala i rischi.»</div>`,
+ say:`<p>Ruolo, contesto, compito, formato di uscita, vincoli. Non servono sempre tutti, ma più elementi si danno, meno l’IA deve indovinare.</p>`,
+ prec:`<p>Le dosi e le procedure di sicurezza vanno sempre verificate sulle fonti ufficiali.</p>`},
+
+{sec:3,title:'Le principali AI generative',
+ body:`<div class="tw"><table class="t"><tr><th>Strumento</th><th>Sviluppatore</th><th>Uso tipico</th></tr>
+ <tr><td>ChatGPT</td><td>OpenAI</td><td>testo, codice, immagini</td></tr>
+ <tr><td>Claude</td><td>Anthropic</td><td>testo, analisi di documenti, codice</td></tr>
+ <tr><td>Gemini</td><td>Google</td><td>testo multimodale, integrazione con Google</td></tr>
+ <tr><td>Copilot</td><td>Microsoft</td><td>assistente in Windows e Office</td></tr>
+ <tr><td>Perplexity</td><td>Perplexity AI</td><td>ricerca con fonti citate</td></tr>
+ <tr><td>Midjourney</td><td>Midjourney</td><td>generazione di immagini</td></tr></table></div>`,
+ say:`<p>Tanti strumenti, stessa logica: cambiano interfaccia, condizioni d’uso e punti di forza. Conviene provarne più di uno sullo stesso compito.</p>`,
+ prec:`<p>Il mercato cambia in fretta: nomi, versioni e piani gratuiti vanno controllati prima della lezione.</p>`},
+
+{sec:4,title:'Hardware per laboratori AI e workshop',
+ body:`<div class="cols3">
+ ${box('PC / workstation','CPU recente, 16–32 GB di RAM|<b>GPU</b> per modelli locali e addestramento|SSD capiente')}
+ ${box('Dispositivi edge','Raspberry Pi, schede tipo Jetson|IA vicino ai sensori|Basso consumo')}
+ ${box('Cloud','Servizi online come Google Colab|Nessuna GPU da acquistare|Servono connessione e attenzione ai dati')}
+ </div>`,
+ say:`<p>Per un workshop base bastano browser e cloud; l’hardware dedicato serve quando i dati non devono uscire dal laboratorio o si lavora su sensori.</p>`},
+
+{sec:4,title:'Software e gestione dei dispositivi',
+ body:li([
+  '<b>Python</b> e <b>Jupyter</b> per esperimenti e analisi dati',
+  'Modelli locali (es. Ollama, LM Studio) quando serve <b>privacy</b>',
+  'Strumenti senza codice, come Teachable Machine',
+  'Gestione: aggiornamenti, <b>ambienti virtuali</b>, account di classe, backup, immagini di sistema da ripristinare']),
+ say:`<p>Un laboratorio ordinato è riproducibile: stesse versioni, stesse configurazioni, postazione ripristinabile a fine lezione.</p>`,
+ lab:`<p>Prepara un’immagine standard del PC di laboratorio con librerie e modelli già installati: il workshop parte in pochi minuti.</p>`},
+
+{sec:5,title:'AI per la manutenzione delle attrezzature',
+ body:`${flow(['Sensori','Dati','Modello','Allarme'])}${li([
+  '<b>Manutenzione predittiva</b>: intervenire prima del guasto',
+  'Analisi di vibrazioni, temperature, correnti, cicli d’uso',
+  'Assistenti che consultano manuali e storico degli interventi',
+  'Meno fermi macchina, ma servono <b>dati puliti</b> e controllo umano'])}`,
+ say:`<p>L’IA riconosce schemi anomali nei dati prima che diventino guasti. Il tecnico resta chi verifica e interviene.</p>`,
+ lab:`<p>Una centrifuga o un forno con sensore di vibrazione o temperatura: l’IA segnala la deriva, tu decidi la manutenzione.</p>`},
+
+{sec:5,title:'In sintesi',
+ body:li([
+  'L’AI Act regola l’IA in base al <b>rischio</b>',
+  'Bias, privacy e spiegabilità sono temi <b>pratici</b>',
+  'La responsabilità resta <b>umana</b>',
+  'Un buon prompt: ruolo, contesto, compito, formato, vincoli',
+  'Scegli strumenti e dispositivi in base a dati e obiettivi']),
+ say:`<p>Usare bene l’IA significa capirne i limiti, proteggere i dati e controllare sempre il risultato.</p>`}
+);
+
+/* ---------- motore ---------- */
+const app=document.getElementById('app'),strip=document.getElementById('strip'),idx=document.getElementById('idx'),cnt=document.getElementById('cnt'),tg=document.getElementById('tg');
+SEC.slice(1,8).forEach((s,k)=>{
+  const b=document.createElement('button');b.className='seg';b.type='button';b.style.setProperty('--c',s.c);
+  b.innerHTML=`<i></i><span>${s.n}</span>`;b.title=s.n;b.setAttribute('aria-label','Vai a '+s.n);
+  b.addEventListener('click',()=>go(S.findIndex(x=>x.sec===k+1)));strip.appendChild(b);
+});
+const segs=[...strip.children];
+const groups={};
+S.forEach((s,i)=>{
+  const sec=SEC[s.sec];
+  const el=document.createElement('section');el.className='slide'+(s.cls?' '+s.cls:'');el.id='s'+(i+1);
+  el.style.setProperty('--sc',sec.c);el.setAttribute('aria-label','Slide '+(i+1)+': '+s.title);
+  let sc='';
+  if(s.say)sc+=`<section><h3>Informazioni</h3>${s.say}</section>`;
+  if(s.prec)sc+=`<section class="prec"><h3>Precisazione </h3>${s.prec}</section>`;
+  if(s.lab)sc+=`<section class="lab"><h3>Esempio per il laboratorio </h3>${s.lab}</section>`;
+  el.innerHTML=`<div class="stage"><article class="card"><h2>${s.title}</h2><div class="body">${s.body}</div><footer><span>${sec.n}</span><span>${i+1} / ${S.length}</span></footer></article></div><aside class="script" aria-label="Testo per argomentare">${sc}</aside>`;
+  app.appendChild(el);
+  (groups[sec.n]=groups[sec.n]||[]).push([i,s.title]);
+});
+Object.keys(groups).forEach(n=>{
+  const og=document.createElement('optgroup');og.label=n;
+  groups[n].forEach(([i,t])=>{const o=document.createElement('option');o.value=i;o.textContent=(i+1)+'. '+t;og.appendChild(o);});
+  idx.appendChild(og);
+});
+const els=[...app.children];let cur=0;
+function go(i,noScroll){
+  i=Math.max(0,Math.min(S.length-1,i));
+  els[cur].classList.remove('on');cur=i;els[cur].classList.add('on');
+  const sec=S[cur].sec;
+  segs.forEach((b,k)=>b.setAttribute('aria-current',String(k+1===sec)));
+  idx.value=cur;cnt.textContent=(cur+1)+' / '+S.length;
+  try{history.replaceState(null,'','#'+(cur+1));}catch(e){}
+  if(!noScroll)window.scrollTo(0,0);
+}
+document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+document.getElementById('next').addEventListener('click',()=>go(cur+1));
+idx.addEventListener('change',()=>go(+idx.value));
+function toggle(){const on=document.body.classList.toggle('solo');tg.textContent=on?'Mostra copione':'Nascondi copione';}
+tg.addEventListener('click',toggle);
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT'||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')go(cur-1);
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);
+  else if(e.key==='s'||e.key==='S')toggle();
+});
+let start=0;try{const h=parseInt((location.hash||'').slice(1),10);if(h>=1&&h<=S.length)start=h-1;}catch(e){}
+els[0].classList.add('on');go(start,true);
+</script>
+</body>
+</html>
